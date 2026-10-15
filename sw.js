@@ -1,5 +1,5 @@
 // 版本號：更新資料或頁面時改這裡，使用者下次開啟就會換新
-const V = 'tb-2026-10-15b';
+const V = 'tb-2026-10-15c';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'data/criminal.json', 'data/procedure.json', 'data/duty.json'];
 self.addEventListener('install', e => e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting())));
