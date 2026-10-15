@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16223A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="記憶樹">
+<title>升官等記憶樹</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky ruling bar (subject + mode), chapter index left on wide screens / chip strip on phones, tree body like an annotated statute book */
+:root{
+  --paper:#F3F5F8; --panel:#FFFFFF; --ink:#16223A; --muted:#5A6577; --line:#D3DAE3;
+  --seal:#B3282E; --sealbg:#F7E4E3; --jade:#2C7656; --jadebg:#DFF0E7; --amber:#9A600A; --amberbg:#F6EBD6;
+  --hi:#E7ECF4;
+  --f-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-ref:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0F141C; --panel:#161D29; --ink:#E5E9F0; --muted:#97A1B2; --line:#283346;
+  --seal:#E2706E; --sealbg:#3A1F22; --jade:#62BE95; --jadebg:#183326; --amber:#E1A94C; --amberbg:#3A2C15; --hi:#1E2737; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0F141C; --panel:#161D29; --ink:#E5E9F0; --muted:#97A1B2; --line:#283346;
+  --seal:#E2706E; --sealbg:#3A1F22; --jade:#62BE95; --jadebg:#183326; --amber:#E1A94C; --amberbg:#3A2C15; --hi:#1E2737; color-scheme:dark}
+:root[data-eink]{
+  --paper:#FFFFFF; --panel:#FFFFFF; --ink:#000000; --muted:#222222; --line:#000000;
+  --seal:#000000; --sealbg:#FFFFFF; --jade:#000000; --jadebg:#FFFFFF; --amber:#000000; --amberbg:#FFFFFF; --hi:#FFFFFF; color-scheme:light}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font:15px/1.7 var(--f-body);-webkit-text-size-adjust:100%}
+:root[data-eink] *{transition:none!important;animation:none!important;box-shadow:none!important}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 8px}
+.bar-in{max-width:1180px;margin:0 auto;display:grid;gap:8px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font:900 20px/1.2 var(--f-display);letter-spacing:.04em;margin:0}
+.brand small{font:500 12px var(--f-body);color:var(--muted);letter-spacing:.1em;margin-left:8px}
+.seg{display:flex;border:1.5px solid var(--ink);border-radius:var(--r);overflow:hidden}
+.seg button{border:0;background:none;padding:5px 12px;cursor:pointer;font-weight:700;white-space:nowrap}
+.seg button+button{border-left:1.5px solid var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.tools{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 12px;cursor:pointer;font-size:13px;white-space:nowrap}
+.chip[aria-pressed="true"]{border-color:var(--seal);color:var(--seal);font-weight:700}
+.modes{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.modes button{border:0;background:none;padding:4px 10px;cursor:pointer;color:var(--muted);border-bottom:2.5px solid transparent;white-space:nowrap;font-weight:500}
+.modes button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--seal);font-weight:700}
+.search{flex:1 1 180px;min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:4px 10px;font:inherit;color:var(--ink)}
+
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 56px;display:grid;gap:20px;grid-template-columns:240px minmax(0,1fr)}
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}}
+.toc{position:sticky;top:120px;align-self:start;display:grid;gap:2px;max-height:calc(100vh - 140px);overflow:auto}
+.toc button{text-align:left;border:0;background:none;padding:6px 10px;border-radius:var(--r);cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:14px}
+.toc button[aria-current="true"]{background:var(--hi);font-weight:700}
+.toc .pct{font:500 11px var(--f-ref);color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:860px){.toc{position:static;max-height:none;display:flex;overflow-x:auto;gap:6px;padding-bottom:4px}
+  .toc button{white-space:nowrap;border:1px solid var(--line);background:var(--panel)}}
+aside{min-width:0}
+.intro{color:var(--muted);font-size:14px;margin:0}
+
+main{min-width:0;display:grid;gap:14px;align-content:start}
+h2.ch{font:900 24px/1.3 var(--f-display);margin:0;text-wrap:balance}
+.lead{margin:0;color:var(--muted)}
+.meter{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--jade)}
+.meta{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted);align-items:center}
+.meta button{border:0;background:none;color:var(--seal);cursor:pointer;padding:0;font-size:13px}
+
+ul.tree,ul.tree ul{list-style:none;margin:0;padding:0}
+ul.tree ul{margin-left:13px;padding-left:14px;border-left:1.5px dashed var(--line)}
+.node{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:6px;align-items:start;padding:5px 4px;border-radius:var(--r)}
+.node:hover{background:var(--hi)}
+.tw{border:0;background:none;cursor:pointer;width:22px;height:24px;color:var(--muted);font-size:12px;padding:0}
+.tw[disabled]{cursor:default;opacity:.35}
+.lbl{min-width:0}
+.t{font-weight:700}
+.lvl0>.node .t{font:900 17px/1.5 var(--f-display)}
+.ref{font:500 12px var(--f-ref);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-left:6px;white-space:nowrap;display:inline-block}
+.tag{font-size:11px;font-weight:700;border-radius:3px;padding:0 5px;margin-left:6px;white-space:nowrap;display:inline-block;letter-spacing:.06em}
+.tag-必考{color:var(--seal);border:1.5px solid var(--seal);transform:rotate(-2deg)}
+.tag-新法{color:var(--jade);background:var(--jadebg)}
+.tag-易錯,.tag-⚠{color:var(--amber);background:var(--amberbg)}
+.tag-口訣{color:var(--ink);background:var(--hi)}
+.d{color:var(--muted);font-size:14px;margin-top:1px;white-space:pre-line}
+.recite .d.hid{color:transparent;background:var(--hi);border-radius:3px;cursor:pointer;user-select:none}
+.recite .d.hid::before{content:"點一下看答案";color:var(--muted);font-size:12px;position:absolute}
+.recite .d.hid{position:relative;min-height:1.4em}
+.known{border:1px solid var(--line);background:var(--panel);border-radius:999px;font-size:12px;padding:1px 8px;cursor:pointer;color:var(--muted);white-space:nowrap}
+.known[aria-pressed="true"]{color:var(--jade);border-color:var(--jade);background:var(--jadebg);font-weight:700}
+
+.card{background:var(--panel);border:1.5px solid var(--ink);border-radius:10px;padding:24px 22px;min-height:220px;display:grid;align-content:center;gap:12px;cursor:pointer}
+.card .q{font:600 19px/1.55 var(--f-display)}
+.card .a{white-space:pre-line;font-size:16px;border-top:1px dashed var(--line);padding-top:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1.5px solid var(--ink);background:var(--panel);border-radius:var(--r);padding:6px 16px;cursor:pointer;font-weight:700}
+.btn.good{border-color:var(--jade);color:var(--jade)}
+.btn.bad{border-color:var(--seal);color:var(--seal)}
+.count{font:500 13px var(--f-ref);color:var(--muted);font-variant-numeric:tabular-nums}
+
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:420px;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font-family:var(--f-display);background:var(--hi);cursor:pointer;white-space:nowrap}
+td:first-child{font-weight:700;white-space:nowrap}
+td.hid{color:transparent;background:var(--hi);cursor:pointer}
+h3.cmp{font:900 17px var(--f-display);margin:8px 0 6px}
+
+.nums{display:grid;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.num{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;padding:9px 12px;border-bottom:1px solid var(--line)}
+.num:last-child{border-bottom:0}
+.num .v{font:900 18px var(--f-display);color:var(--seal);text-align:right;font-variant-numeric:tabular-nums;cursor:pointer}
+.num .v.hid{color:transparent;background:var(--hi);border-radius:3px;min-width:4em}
+.num .ref{margin:0;grid-column:1/-1;justify-self:start}
+
+.tl{list-style:none;margin:0;padding:0;border-left:2px solid var(--ink);display:grid;gap:12px}
+.tl li{padding-left:16px;position:relative}
+.tl li::before{content:"";position:absolute;left:-6px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:2px solid var(--seal)}
+.tl .dt{font:500 13px var(--f-ref);color:var(--seal)}
+.hit{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.hit .path{font-size:12px;color:var(--muted)}
+mark{background:var(--sealbg);color:inherit;border-radius:2px}
+.empty{color:var(--muted);padding:24px 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+[hidden]{display:none!important}
+body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+</style>
+
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <div class="top">
+      <h1 class="brand">升官等記憶樹<small>115.11.7 應試版</small></h1>
+      <div class="seg" id="subj" role="group" aria-label="科目"></div>
+      <div class="tools">
+        <button class="chip" id="recite" aria-pressed="false">背誦模式</button>
+        <button class="chip" id="eink" aria-pressed="false">電子紙</button>
+      </div>
+    </div>
+    <div class="top">
+      <nav class="modes" id="modes" aria-label="檢視方式"></nav>
+      <input class="search" id="q" type="search" placeholder="搜尋條號或關鍵字，例如 §130、夜間" aria-label="搜尋">
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <aside><nav class="toc" id="toc" aria-label="章節"></nav></aside>
+  <main id="main"><p class="empty">載入中…</p></main>
+</div>
+
+<script>
+const SUBJECTS=[["criminal","刑法"],["procedure","刑訴"],["duty","勤務"]];
+const MODES=[["tree","樹狀"],["cards","閃卡"],["compare","對照"],["numbers","數字"],["updates","新法"]];
+const $=s=>document.querySelector(s), el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let S={subject:"criminal",mode:"tree",ch:{},recite:false,eink:false,known:{},cards:{},onlyWeak:false};
+try{Object.assign(S,JSON.parse(localStorage.getItem("tb-v1")||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem("tb-v1",JSON.stringify(S))}catch(e){}};
+const DATA={};
+async function load(id){
+  if(DATA[id])return DATA[id];
+  const r=await fetch(`data/${id}.json`);if(!r.ok)throw new Error(r.status);
+  const d=await r.json();
+  d.chapters.forEach(c=>{const walk=(ns,p)=>ns.forEach((n,i)=>{n.k=`${id}/${c.id}/${p}${i}`;n.c&&walk(n.c,`${p}${i}.`)});walk(c.tree||[],"")});
+  return DATA[id]=d;
+}
+const nodesOf=c=>{const a=[];const w=ns=>ns.forEach(n=>{a.push(n);n.c&&w(n.c)});w(c.tree||[]);return a};
+
+function header(){
+  $("#subj").replaceChildren(...SUBJECTS.map(([id,n])=>{const b=el("button",null,n);b.setAttribute("aria-pressed",S.subject===id);b.onclick=()=>{S.subject=id;render()};return b}));
+  $("#modes").replaceChildren(...MODES.map(([id,n])=>{const b=el("button",null,n);b.setAttribute("aria-pressed",S.mode===id&&!$("#q").value);b.onclick=()=>{S.mode=id;$("#q").value="";render()};return b}));
+  $("#recite").setAttribute("aria-pressed",S.recite);$("#eink").setAttribute("aria-pressed",S.eink);
+  document.documentElement.toggleAttribute("data-eink",S.eink);
+}
+function toc(d){
+  const cur=S.ch[S.subject]||d.chapters[0].id;
+  $("#toc").replaceChildren(...d.chapters.map(c=>{
+    const ns=nodesOf(c),k=ns.filter(n=>S.known[n.k]).length;
+    const b=el("button",null,`<span>${esc(c.title)}</span><span class="pct">${ns.length?Math.round(k/ns.length*100)+"%":""}</span>`);
+    b.setAttribute("aria-current",c.id===cur&&S.mode==="tree");b.onclick=()=>{S.ch[S.subject]=c.id;S.mode="tree";$("#q").value="";render();scrollTo(0,0)};return b}));
+  return d.chapters.find(c=>c.id===cur)||d.chapters[0];
+}
+function nodeEl(n,lvl){
+  const li=el("li","lvl"+lvl),row=el("div","node");
+  const tw=el("button","tw",n.c?"▾":"•");tw.disabled=!n.c;tw.setAttribute("aria-label","展開或收合");
+  const lb=el("div","lbl",`<span class="t">${esc(n.t)}</span>${n.tag?`<span class="tag tag-${esc(n.tag)}">${esc(n.tag)}</span>`:""}${n.ref?`<span class="ref">${esc(n.ref)}</span>`:""}`);
+  if(n.d){const d=el("div","d"+(S.recite?" hid":""),esc(n.d));d.onclick=()=>d.classList.toggle("hid");lb.append(d)}
+  const kb=el("button","known",S.known[n.k]?"熟":"未熟");kb.setAttribute("aria-pressed",!!S.known[n.k]);
+  kb.onclick=()=>{S.known[n.k]?delete S.known[n.k]:S.known[n.k]=1;save();kb.setAttribute("aria-pressed",!!S.known[n.k]);kb.textContent=S.known[n.k]?"熟":"未熟";updMeter()};
+  row.append(tw,lb,kb);li.append(row);
+  if(n.c){const ul=el("ul");n.c.forEach(x=>ul.append(nodeEl(x,lvl+1)));li.append(ul);
+    tw.onclick=()=>{ul.hidden=!ul.hidden;tw.textContent=ul.hidden?"▸":"▾"}}
+  return li;
+}
+let updMeter=()=>{};
+function viewTree(d,c){
+  const m=$("#main");m.className=S.recite?"recite":"";
+  const ns=nodesOf(c),meter=el("div","meter","<i></i>"),meta=el("div","meta");
+  updMeter=()=>{const k=ns.filter(n=>S.known[n.k]).length;meter.firstChild.style.width=(k/ns.length*100)+"%";meta.firstChild.textContent=`已熟 ${k} / ${ns.length} 個節點`;toc(d)};
+  meta.append(el("span"));
+  const all=el("button",null,"全部收合");all.onclick=()=>{const hide=all.textContent==="全部收合";m.querySelectorAll("ul.tree ul").forEach(u=>u.hidden=hide);m.querySelectorAll(".tw:not([disabled])").forEach(t=>t.textContent=hide?"▸":"▾");all.textContent=hide?"全部展開":"全部收合"};
+  meta.append(all);
+  const ul=el("ul","tree");(c.tree||[]).forEach(n=>ul.append(nodeEl(n,0)));
+  m.replaceChildren(el("h2","ch",esc(c.title)),...(c.lead?[el("p","lead",esc(c.lead))]:[]),meter,meta,ul);updMeter();
+}
+function viewCards(d){
+  const m=$("#main");m.className="";
+  const cur=S.ch[S.subject];let list=d.cards.map((x,i)=>({...x,k:`${S.subject}/card${i}`}));
+  if(S.onlyWeak)list=list.filter(x=>S.cards[x.k]!==1);
+  let i=0,open=false;
+  const box=el("div"),ctr=el("span","count"),weak=el("button","chip",`只看不熟`);weak.setAttribute("aria-pressed",S.onlyWeak);
+  weak.onclick=()=>{S.onlyWeak=!S.onlyWeak;save();viewCards(d)};
+  const shuf=el("button","chip","洗牌");shuf.onclick=()=>{for(let j=list.length-1;j>0;j--){const r=Math.random()*(j+1)|0;[list[j],list[r]]=[list[r],list[j]]}i=0;draw()};
+  const draw=()=>{if(!list.length){box.replaceChildren(el("p","empty","這一科的卡片都標成熟了。關掉「只看不熟」可以全部再看一次。"));ctr.textContent="";return}
+    const x=list[i],ch=d.chapters.find(c=>c.id===x.ch);
+    const card=el("div","card",`<div class="count">${esc(ch?ch.title:"")}</div><div class="q">${esc(x.q)}</div>${open?`<div class="a">${esc(x.a)}${x.ref?` <span class="ref">${esc(x.ref)}</span>`:""}</div>`:`<div class="count">點卡片翻面</div>`}`);
+    card.onclick=()=>{open=!open;draw()};
+    const nav=el("div","row");const prev=el("button","btn","上一張"),bad=el("button","btn bad","不熟"),good=el("button","btn good","熟了");
+    const go=s=>{i=(i+s+list.length)%list.length;open=false;draw()};
+    prev.onclick=()=>go(-1);bad.onclick=()=>{S.cards[x.k]=0;save();go(1)};good.onclick=()=>{S.cards[x.k]=1;save();go(1)};
+    nav.append(prev,bad,good);box.replaceChildren(card,nav);ctr.textContent=`${i+1} / ${list.length}　熟 ${list.filter(y=>S.cards[y.k]===1).length}`};
+  const tools=el("div","row");tools.append(weak,shuf,ctr);
+  m.replaceChildren(el("h2","ch",`${esc(d.name)}閃卡`),tools,box);draw();
+}
+function viewCompare(d){
+  const m=$("#main");m.className="";const out=[el("h2","ch",`${esc(d.name)}易混淆對照`),el("p","lead","點欄位標題可以遮住整欄自我測驗，點格子單獨顯示。")];
+  d.compare.forEach(t=>{const w=el("div","tbl"),tb=el("table");
+    const hr=el("tr");hr.append(el("th",null,"比較"));t.cols.forEach((c,ci)=>{const th=el("th",null,esc(c));th.onclick=()=>tb.querySelectorAll(`td[data-c="${ci}"]`).forEach(td=>td.classList.toggle("hid"));hr.append(th)});
+    tb.append(hr);t.rows.forEach(r=>{const tr=el("tr");r.forEach((v,ci)=>{const td=el("td",null,esc(v));if(ci){td.dataset.c=ci-1;if(S.recite)td.classList.add("hid");td.onclick=()=>td.classList.toggle("hid")}tr.append(td)});tb.append(tr)});
+    w.append(tb);out.push(el("h3","cmp",esc(t.title)),w)});
+  m.replaceChildren(...out);
+}
+function viewNumbers(d){
+  const m=$("#main");m.className="";const box=el("div","nums");
+  d.numbers.forEach(x=>{const r=el("div","num",`<div>${esc(x.k)}</div>`);const v=el("div","v"+(S.recite?" hid":""),esc(x.v));v.onclick=()=>v.classList.toggle("hid");r.append(v);if(x.ref)r.append(el("span","ref",esc(x.ref)));box.append(r)});
+  m.replaceChildren(el("h2","ch",`${esc(d.name)}數字速記`),el("p","lead","開啟背誦模式會遮住數字，點一下顯示。"),box);
+}
+function viewUpdates(d){
+  const m=$("#main");m.className="";const ul=el("ul","tl");
+  d.updates.forEach(x=>ul.append(el("li",null,`<div class="dt">${esc(x.date)}${x.ref?`<span class="ref">${esc(x.ref)}</span>`:""}</div><div>${esc(x.text)}</div>`)));
+  m.replaceChildren(el("h2","ch",`${esc(d.name)}近年修法與憲判`),ul);
+}
+function viewSearch(d,q){
+  const m=$("#main");m.className="";const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"),hl=s=>esc(s).replace(new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"),x=>`<mark>${x}</mark>`);
+  const hits=[];
+  d.chapters.forEach(c=>{const w=(ns,p)=>ns.forEach(n=>{const s=[n.t,n.d,n.ref].join(" ");if(re.test(s))hits.push(el("div","hit",`<div class="path">${esc(c.title)}${p.length?" › "+esc(p.join(" › ")):""}</div><span class="t">${hl(n.t)}</span>${n.ref?`<span class="ref">${hl(n.ref)}</span>`:""}${n.d?`<div class="d">${hl(n.d)}</div>`:""}`));re.lastIndex=0;n.c&&w(n.c,[...p,n.t])});w(c.tree||[],[])});
+  d.cards.forEach(x=>{if(re.test(x.q+x.a+(x.ref||"")))hits.push(el("div","hit",`<div class="path">閃卡</div><span class="t">${hl(x.q)}</span><div class="d">${hl(x.a)}</div>`));re.lastIndex=0});
+  m.replaceChildren(el("h2","ch",`搜尋「${esc(q)}」`),el("p","lead",`${hits.length} 筆，範圍：${esc(d.name)}`),...(hits.length?hits:[el("p","empty","沒有符合的內容，試試條號（例如 §130）或較短的關鍵字。")]));
+}
+async function render(){
+  save();header();
+  let d;try{d=await load(S.subject)}catch(e){$("#main").replaceChildren(el("p","empty","這一科的資料沒有載入成功，請重新整理頁面。"));return}
+  const c=toc(d),q=$("#q").value.trim();
+  if(q)return viewSearch(d,q);
+  ({tree:()=>viewTree(d,c),cards:()=>viewCards(d),compare:()=>viewCompare(d),numbers:()=>viewNumbers(d),updates:()=>viewUpdates(d)})[S.mode]();
+}
+$("#recite").onclick=()=>{S.recite=!S.recite;render()};
+$("#eink").onclick=()=>{S.eink=!S.eink;render()};
+let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
+render();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+
+</body>
+</html>
