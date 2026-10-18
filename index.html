@@ -132,6 +132,34 @@ h3.cmp{font:900 17px var(--f-display);margin:8px 0 6px}
 mark{background:var(--sealbg);color:inherit;border-radius:2px}
 .empty{color:var(--muted);padding:24px 0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* 申論連結：以原有預測題為中心的情境→答題骨架分段回想，不修改既有樹狀資料。 */
+.essay-grid{display:grid;grid-template-columns:minmax(175px,220px) minmax(0,1fr);gap:15px;align-items:start}
+.essay-list{display:grid;gap:5px;max-height:65vh;overflow:auto;padding-right:4px}
+.essay-list button{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:7px 9px;cursor:pointer;font-size:13px;line-height:1.5}
+.essay-list button[aria-current="true"]{border:2px solid var(--seal);font-weight:700;background:var(--sealbg)}
+.essay-list small{display:block;font-size:11px;color:var(--muted)}
+.essay-work{display:grid;gap:12px;min-width:0}
+.essay-scene{display:flex;align-items:center;gap:16px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:13px 15px}
+.essay-icon{font-size:42px;line-height:1;flex:none;filter:saturate(.86)}
+.essay-scene strong{font-family:var(--f-display);font-size:17px}
+.essay-scene .hint{font-size:12px;color:var(--muted)}
+.essay-question{border-left:4px solid var(--seal);padding:12px 14px;background:var(--panel);white-space:pre-wrap;line-height:1.75}
+.essay-route{display:flex;flex-wrap:wrap;gap:9px;align-items:stretch;counter-reset:recite}
+.essay-step{flex:1 1 160px;min-width:0;display:flex;align-items:center;gap:9px;border:1px solid var(--jade);border-radius:9px;padding:10px;background:var(--jadebg);animation:essay-pop .28s ease-out both}
+.essay-step .seq{font:700 12px var(--f-ref);display:grid;place-items:center;border-radius:50%;background:var(--jade);color:var(--panel);width:25px;height:25px;flex:none}
+.essay-step span:last-child{font-weight:700;font-size:14px;overflow-wrap:anywhere}
+.essay-step.pending{border-style:dashed;border-color:var(--line);background:var(--panel);color:var(--muted)}
+.essay-step.pending .seq{background:var(--line);color:var(--ink)}
+.essay-action{display:flex;flex-wrap:wrap;gap:7px}
+.essay-action .btn{padding:6px 11px;font-size:13px}
+.essay-notice{font-size:12px;color:var(--muted)}
+.essay-notice strong{color:var(--seal)}
+@keyframes essay-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:670px){.essay-grid{grid-template-columns:minmax(0,1fr)}.essay-list{display:flex;overflow-x:auto;max-height:none;padding-bottom:5px}.essay-list button{min-width:170px;max-width:210px;flex:none}.essay-icon{font-size:34px}}
+@media(prefers-reduced-motion:reduce){.essay-step{animation:none}}
+:root[data-eink] .essay-step{animation:none}
+
 [hidden]{display:none!important}
 body{margin:0}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -162,13 +190,24 @@ body{margin:0}
 
 <script>
 const SUBJECTS=[["criminal","刑法"],["procedure","刑訴"],["duty","勤務"]];
-const MODES=[["tree","樹狀"],["cards","閃卡"],["compare","對照"],["numbers","數字"],["updates","新法"]];
+const MODES=[["tree","樹狀"],["essay","申論連結"],["cards","閃卡"],["compare","對照"],["numbers","數字"],["updates","新法"]];
 const $=s=>document.querySelector(s), el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let S={subject:"criminal",mode:"tree",ch:{},recite:false,eink:false,known:{},cards:{},onlyWeak:false};
 try{Object.assign(S,JSON.parse(localStorage.getItem("tb-v1")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("tb-v1",JSON.stringify(S))}catch(e){}};
+// 申論題記憶路徑的進度獨立於原本的樹狀節點、閃卡熟練度。
+S.essayPick ||= {}; S.essayKnown ||= {};
 const DATA={};
+let ESSAY_DATA;
+async function loadEssays(){
+  if(ESSAY_DATA)return ESSAY_DATA;
+  const r=await fetch('data/essay-memory.json');
+  if(!r.ok)throw new Error('申論資料載入失敗：'+r.status);
+  const d=await r.json();
+  if(!Array.isArray(d.items))throw new Error('申論資料格式異常');
+  return ESSAY_DATA=d;
+}
 async function load(id){
   if(DATA[id])return DATA[id];
   const r=await fetch(`data/${id}.json`);if(!r.ok)throw new Error(r.status);
@@ -234,6 +273,51 @@ function viewCards(d){
   const tools=el("div","row");tools.append(weak,shuf,ctr);
   m.replaceChildren(el("h2","ch",`${esc(d.name)}閃卡`),tools,box);draw();
 }
+
+function viewEssay(d,collection){
+  const m=$('#main');m.className='';
+  const list=collection.items.filter(x=>x.subject===S.subject);
+  if(!list.length){m.replaceChildren(el('p','empty','本學科尚未建立申論記憶路徑。'));return}
+  const saved=S.essayPick[S.subject]||list[0].id;
+  const chosen=list.find(x=>x.id===saved)||list[0];
+  let revealed=0;
+  const heading=el('h2','ch',esc(d.name)+'｜申論考題記憶路徑');
+  const intro=el('p','lead','依既有第五版預測題，先回想「如何分段作答」，再逐步揭露原答案的小標題；主觀猜題機率不是命中保證。');
+  const layout=el('div','essay-grid'), nav=el('nav','essay-list'),work=el('section','essay-work');
+  nav.setAttribute('aria-label','申論預測題清單');
+  const draw=()=>{
+    nav.replaceChildren(...list.map(x=>{
+      const b=el('button',null,`<small>預測 ${x.number} · ${esc(x.sourcePriority)} · ${S.essayKnown[x.id]?'已回想':'未回想'}</small>${esc(x.title)}`);
+      b.setAttribute('aria-current',x.id===chosen.id);
+      b.onclick=()=>{S.essayPick[S.subject]=x.id;save();viewEssay(d,collection)};
+      return b;
+    }));
+    const scene=el('div','essay-scene',`<span class="essay-icon" aria-hidden="true">${esc(chosen.scene)}</span><div><strong>${esc(chosen.title)}</strong><div class="hint">圖像是題目聯想提示，不代表法律結論</div></div>`);
+    const question=el('div','essay-question',esc(chosen.question));
+    const route=el('div','essay-route');route.setAttribute('aria-label','申論答案分段記憶路徑');
+    chosen.steps.forEach((step,i)=>{
+      const shown=i<revealed;
+      const node=el('div','essay-step'+(shown?'':' pending'),`<span class="seq">${i+1}</span><span>${shown?esc(step):'第 '+(i+1)+' 段：先自行回想'}</span>`);
+      node.style.animationDelay=shown?Math.min(i,5)*40+'ms':'0ms';route.append(node);
+    });
+    const actions=el('div','essay-action');
+    const next=el('button','btn good',revealed>=chosen.steps.length?'已全部揭露':'揭露下一段');next.disabled=revealed>=chosen.steps.length;
+    next.onclick=()=>{revealed=Math.min(chosen.steps.length,revealed+1);draw()};
+    const show=el('button','btn','全部顯示');show.onclick=()=>{revealed=chosen.steps.length;draw()};
+    const reset=el('button','btn','重新回想');reset.onclick=()=>{revealed=0;draw()};
+    const mark=el('button','btn',S.essayKnown[chosen.id]?'取消已回想':'標記已回想');
+    mark.setAttribute('aria-pressed',!!S.essayKnown[chosen.id]);
+    mark.onclick=()=>{if(S.essayKnown[chosen.id])delete S.essayKnown[chosen.id];else S.essayKnown[chosen.id]=1;save();draw()};
+    const link=el('button','btn','前往相關記憶樹章節');link.onclick=()=>{
+      S.ch[S.subject]=chosen.chapter;S.mode='tree';$('#q').value='';render();window.scrollTo({top:0,behavior:'auto'});
+    };
+    actions.append(next,show,reset,mark,link);
+    const caution=el('p','essay-notice',`原始來源：${esc(chosen.source)}。路徑為原參考答案的 ${chosen.steps.length} 個第一層小標題；${chosen.hasCaution?'<strong>原稿含 ⚠ 待查項目，請勿視為已查證完成。</strong>':'法條細節仍請以原稿及官方法源複核。'}`);
+    work.replaceChildren(scene,el('p','lead',`題 ${chosen.number}　｜　原稿主觀分類：${esc(chosen.sourcePriority)}　｜　${chosen.steps.length} 段答題骨架`),question,route,actions,caution);
+  };
+  layout.append(nav,work);m.replaceChildren(heading,intro,layout);draw();
+}
+
 function viewCompare(d){
   const m=$("#main");m.className="";const out=[el("h2","ch",`${esc(d.name)}易混淆對照`),el("p","lead","點欄位標題可以遮住整欄自我測驗，點格子單獨顯示。")];
   d.compare.forEach(t=>{const w=el("div","tbl"),tb=el("table");
@@ -264,6 +348,10 @@ async function render(){
   let d;try{d=await load(S.subject)}catch(e){$("#main").replaceChildren(el("p","empty","這一科的資料沒有載入成功，請重新整理頁面。"));return}
   const c=toc(d),q=$("#q").value.trim();
   if(q)return viewSearch(d,q);
+  if(S.mode==='essay'){
+    try{return viewEssay(d,await loadEssays())}
+    catch(e){$("#main").replaceChildren(el('p','empty','申論連結資料載入失敗，請確認 data/essay-memory.json 已與頁面一起部署。'));return}
+  }
   ({tree:()=>viewTree(d,c),cards:()=>viewCards(d),compare:()=>viewCompare(d),numbers:()=>viewNumbers(d),updates:()=>viewUpdates(d)})[S.mode]();
 }
 $("#recite").onclick=()=>{S.recite=!S.recite;render()};

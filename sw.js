@@ -1,7 +1,7 @@
 // 版本號：更新資料或頁面時改這裡，使用者下次開啟就會換新
-const V = 'tb-2026-10-18d';
+const V = 'tb-2026-10-18e';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
-  'data/criminal.json', 'data/procedure.json', 'data/duty.json'];
+  'data/criminal.json', 'data/procedure.json', 'data/duty.json', 'data/essay-memory.json'];
 self.addEventListener('install', e => e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys()
   .then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())));
