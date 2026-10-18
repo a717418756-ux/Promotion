@@ -1,16 +1,24 @@
-// 版本號：更新資料或頁面時改這裡，使用者下次開啟就會換新
-const V = 'tb-2026-10-18e';
+// 版本號沿用本專案日期＋字母規則；CacheStorage 對同一來源的其他 PWA 共用，勿刪除其他專案快取。
+const V = 'tb-2026-10-18h';
+const CACHE = 'promotion-' + V;
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'data/criminal.json', 'data/procedure.json', 'data/duty.json', 'data/essay-memory.json'];
-self.addEventListener('install', e => e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting())));
-self.addEventListener('activate', e => e.waitUntil(caches.keys()
-  .then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())));
-// 先用快取（離線可用），同時在背景抓新版存回快取
+self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())));
+self.addEventListener('activate', e => e.waitUntil(caches.keys().then(names => Promise.all(
+  names.filter(name => name.startsWith('promotion-') && name !== CACHE).map(name => caches.delete(name))
+)).then(() => self.clients.claim())));
+// 同一 PWA 範圍快取優先；背景更新需延長事件生命週期，並避免快取外部來源。
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  e.respondWith(caches.open(V).then(async c => {
-    const hit = await c.match(e.request);
-    const net = fetch(e.request).then(r => { if (r.ok || r.type === 'opaque') c.put(e.request, r.clone()); return r; }).catch(() => hit);
-    return hit || net;
+  const url = new URL(e.request.url);
+  if (url.origin !== self.location.origin || !url.pathname.startsWith(new URL(self.registration.scope).pathname)) return;
+  e.respondWith(caches.open(CACHE).then(async cache => {
+    const hit = await cache.match(e.request);
+    const update = fetch(e.request).then(async res => {
+      if (res.ok) await cache.put(e.request, res.clone());
+      return res;
+    });
+    if (hit) { e.waitUntil(update.catch(() => {})); return hit; }
+    return update;
   }));
 });

@@ -160,9 +160,72 @@ mark{background:var(--sealbg);color:inherit;border-radius:2px}
 @media(prefers-reduced-motion:reduce){.essay-step{animation:none}}
 :root[data-eink] .essay-step{animation:none}
 
+
+/* f 版：題目→視覺線索→遮蔽回想→完整答案→自己評分，離線運作。 */
+.wrap.essay-layout{grid-template-columns:minmax(0,1fr)}
+.wrap.essay-layout aside{display:none}
+.essay-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.essay-toolbar .chip{font-size:12px;padding:5px 12px}
+.essay-toolbar .chip[aria-pressed="true"]{background:var(--hi);border-color:var(--ink);color:var(--ink)}
+.essay-summary{font-size:12px;color:var(--muted);margin-left:auto}
+.essay-review{font-size:12px;color:var(--muted);border-left:3px solid var(--jade);padding:8px 11px;background:var(--panel)}
+.essay-map{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel)}
+.essay-map-title{font-weight:700;margin-bottom:8px;font-family:var(--f-display)}
+.essay-path{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;align-items:stretch}
+.essay-path-cell{border-radius:8px;background:var(--hi);padding:11px;border:1px solid var(--line);min-width:0;position:relative}
+.essay-path-cell .vicon{font-size:25px;display:block}
+.essay-path-cell strong{display:block;margin:3px 0;font-size:14px}
+.essay-path-cell small{display:block;font-size:12px;line-height:1.6;color:var(--muted)}
+.essay-lanes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px}
+.essay-lane{border:1px solid var(--line);border-radius:8px;overflow:hidden;min-width:0}
+.essay-lane header{font-size:14px;font-weight:700;background:var(--hi);padding:7px 11px}
+.essay-lane ol{margin:0;padding:10px 10px 12px 30px;font-size:13px;display:grid;gap:7px}
+.essay-map-note{font-size:12px;color:var(--muted);margin:9px 0 0}
+.essay-answer{white-space:pre-wrap;font:14px/1.85 var(--f-body);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:16px;max-height:70vh;overflow:auto;overflow-wrap:anywhere;margin:0}
+.essay-grade{display:flex;flex-wrap:wrap;align-items:center;gap:8px;border:1px dashed var(--line);border-radius:9px;padding:12px}
+.essay-grade-title{flex:1 1 100%;font-weight:700;font-size:14px}
+.essay-grade .btn{font-size:13px;padding:7px 10px}
+.essay-grade .btn[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.essay-badge{display:inline-block;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:1px 7px;margin-left:5px}
+.essay-source-links{display:flex;flex-wrap:wrap;gap:8px;font-size:12px}
+.essay-source-links a{color:var(--jade);text-decoration:underline;text-underline-offset:2px}
+.essay-progress{border-radius:50px;height:6px;background:var(--line);overflow:hidden}
+.essay-progress i{display:block;height:100%;background:var(--jade);transition:width .16s ease}
+.essay-source-note{color:var(--muted);font-size:12px;line-height:1.7}
+@media(max-width:670px){.essay-toolbar{gap:5px}.essay-summary{width:100%;margin-left:0}.essay-path{grid-template-columns:repeat(2,minmax(0,1fr))}.essay-lanes{grid-template-columns:minmax(0,1fr)}}
+:root[data-eink] .essay-progress i{transition:none}
+
 [hidden]{display:none!important}
 body{margin:0}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+
+/* g 版：從看答案改成自行默寫與視覺逐步回想；不改原有樹狀等五種模式 */
+.essay-compose{display:grid;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.essay-compose-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px;justify-content:space-between}
+.essay-compose h3{font:700 16px/1.5 var(--f-display);margin:0}
+.essay-compose textarea{display:block;width:100%;min-height:155px;resize:vertical;padding:12px;font:14px/1.7 var(--f-body);background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:8px}
+.essay-compose .note{font-size:12px;color:var(--muted);margin:0}
+.essay-compose .actions{display:flex;gap:7px;flex-wrap:wrap}
+.essay-selfcheck{display:grid;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:12px}
+.essay-selfcheck h3{font:700 15px var(--f-display);margin:0}
+.essay-checkline{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:13px}
+.essay-checkline input{width:18px;height:18px;flex:none;margin-top:3px;accent-color:var(--jade)}
+.essay-checkline span{overflow-wrap:anywhere}
+.essay-visual-step{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.essay-visual-step .btn{padding:4px 11px;font-size:12px}
+.essay-map .muted-visual{background:var(--panel);border-style:dashed;opacity:.84}
+.essay-map .muted-visual>*{visibility:hidden}
+.essay-map .muted-visual::after{content:'先試著在腦中還原';color:var(--muted);font-size:12px;display:block;position:absolute;inset:8px}
+.essay-map .essay-path-cell{min-height:104px}
+.essay-visual-note{font-size:12px;color:var(--muted);margin:0}
+.essay-timer{display:flex;gap:9px;flex-wrap:wrap;align-items:center;border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:11px 13px}
+.essay-timer h3{font:700 15px var(--f-display);margin:0 8px 0 0}
+.essay-timer-display{font:700 20px var(--f-ref);font-variant-numeric:tabular-nums;min-width:72px}
+.essay-timer-length{font:inherit;font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:4px}
+.essay-errors textarea{min-height:82px}
+@media(max-width:670px){.essay-timer .essay-notice{flex:1 1 100%}}
+@media(max-width:670px){.essay-compose textarea{min-height:125px}.essay-map .essay-path-cell{min-height:90px}}
+
 </style>
 
 </head>
@@ -190,14 +253,27 @@ body{margin:0}
 
 <script>
 const SUBJECTS=[["criminal","刑法"],["procedure","刑訴"],["duty","勤務"]];
-const MODES=[["tree","樹狀"],["essay","申論連結"],["cards","閃卡"],["compare","對照"],["numbers","數字"],["updates","新法"]];
+const MODES=[["essay","申論訓練"],["tree","樹狀"],["cards","閃卡"],["compare","對照"],["numbers","數字"],["updates","新法"]];
 const $=s=>document.querySelector(s), el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-let S={subject:"criminal",mode:"tree",ch:{},recite:false,eink:false,known:{},cards:{},onlyWeak:false};
+let S={subject:"criminal",mode:"essay",ch:{},recite:false,eink:false,known:{},cards:{},onlyWeak:false};
 try{Object.assign(S,JSON.parse(localStorage.getItem("tb-v1")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("tb-v1",JSON.stringify(S))}catch(e){}};
 // 申論題記憶路徑的進度獨立於原本的樹狀節點、閃卡熟練度。
-S.essayPick ||= {}; S.essayKnown ||= {};
+S.essayPick ||= {}; S.essayKnown ||= {}; S.essayRecall ||= {}; S.essayFilter ||= "all";
+const DRAFT_KEY='tb-essay-draft-v1';
+// 易錯註記獨立儲存；舊有 tb-v1、閃卡與默寫草稿鍵值保持相容。
+const ERROR_KEY='tb-essay-errors-v1';
+let essayErrors={};
+try{const e=JSON.parse(localStorage.getItem(ERROR_KEY)||'{}');if(e&&typeof e==='object'&&!Array.isArray(e))essayErrors=e}catch(e){}
+const saveErrors=()=>{try{localStorage.setItem(ERROR_KEY,JSON.stringify(essayErrors));return true}catch(e){return false}};
+let activeTimer=null;
+const stopEssayTimer=()=>{if(activeTimer!==null){clearInterval(activeTimer);activeTimer=null}};
+const clockText=seconds=>`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+
+let essayDrafts={};
+try{const v=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');if(v&&typeof v==='object'&&!Array.isArray(v))essayDrafts=v}catch(e){}
+const saveDrafts=()=>{try{localStorage.setItem(DRAFT_KEY,JSON.stringify(essayDrafts));return true}catch(e){return false}};
 const DATA={};
 let ESSAY_DATA;
 async function loadEssays(){
@@ -275,47 +351,190 @@ function viewCards(d){
 }
 
 function viewEssay(d,collection){
-  const m=$('#main');m.className='';
-  const list=collection.items.filter(x=>x.subject===S.subject);
-  if(!list.length){m.replaceChildren(el('p','empty','本學科尚未建立申論記憶路徑。'));return}
-  const saved=S.essayPick[S.subject]||list[0].id;
-  const chosen=list.find(x=>x.id===saved)||list[0];
-  let revealed=0;
-  const heading=el('h2','ch',esc(d.name)+'｜申論考題記憶路徑');
-  const intro=el('p','lead','依既有第五版預測題，先回想「如何分段作答」，再逐步揭露原答案的小標題；主觀猜題機率不是命中保證。');
-  const layout=el('div','essay-grid'), nav=el('nav','essay-list'),work=el('section','essay-work');
+  const m=$('#main');m.className='';stopEssayTimer();
+  const all=collection.items.filter(x=>x.subject===S.subject);
+  if(!all.length){m.replaceChildren(el('p','empty','這一科尚無申論預測題。'));return}
+  const today=Date.now(), recall=x=>S.essayRecall[x.id];
+  const grade=x=>recall(x)?.grade??(S.essayKnown[x.id]?2:-1);
+  const due=x=>!recall(x)?!S.essayKnown[x.id]:today>=(recall(x).dueAt||0);
+  const filter=S.essayFilter;
+  const list=all.filter(x=>filter==='all'||(filter==='priority'&&x.studyPriority==='A')||(filter==='review'&&due(x))||(filter==='errors'&&Boolean(essayErrors[x.id]?.trim())));
+  const selectedId=S.essayPick[S.subject];
+  const chosen=list.find(x=>x.id===selectedId)||list[0];
+  const heading=el('h2','ch',`${esc(d.name)}｜申論情境記憶`);
+  const intro=el('p','lead','看題→自己想爭點→揭露骨架→看流程圖→核對原稿校訂答案→自我評分。猜題分類是主觀研判，不能當作命中機率。');
+  const toolbar=el('div','essay-toolbar');
+  [['all','全部題目'],['priority','優先複習 A'],['review','到期／未作答'],['errors','錯漏註記']].forEach(([id,label])=>{
+    const b=el('button','chip',label);b.setAttribute('aria-pressed',S.essayFilter===id);
+    b.onclick=()=>{S.essayFilter=id;save();viewEssay(d,collection)};toolbar.append(b);
+  });
+  const done=all.filter(x=>grade(x)===2).length;
+  const random=el('button','chip','隨機抽題');random.disabled=!list.length;
+  random.onclick=()=>{const pool=list.filter(x=>x.id!==chosen?.id);const picks=pool.length?pool:list;
+    S.essayPick[S.subject]=picks[Math.floor(Math.random()*picks.length)].id;save();viewEssay(d,collection)};
+  toolbar.append(random,el('span','essay-summary',`本科 ${all.length} 題｜完整回想過 ${done} 題｜待複習 ${all.filter(due).length} 題`));
+  if(!chosen){m.replaceChildren(heading,intro,toolbar,el('p','empty','目前沒有符合篩選條件的題目。切換「全部題目」可繼續練習。'));return}
+  let revealed=0,mapVisible=false,answerVisible=false,visualCount=0;
+  let draftText=String(essayDrafts[chosen.id]||'');
+  const checkedSteps=new Set();
+  let errorText=String(essayErrors[chosen.id]||'');
+  let durationSeconds=15*60,remainingSeconds=durationSeconds,timerRunning=false;
+  const timerBox=el('section','essay-timer'),timerDisplay=el('strong','essay-timer-display',clockText(remainingSeconds));
+  timerDisplay.setAttribute('role','timer');
+  const timerStatus=el('span','essay-notice','僅本頁計時；切題或離開後重置，不限制答題。');
+  const tick=()=>{remainingSeconds=Math.max(0,remainingSeconds-1);timerDisplay.textContent=clockText(remainingSeconds);
+    if(remainingSeconds===0){stopEssayTimer();timerRunning=false;timerStatus.textContent='時間到，仍可繼續寫或自行核對。'}};
+  const startTimer=el('button','btn','開始計時'),resetTimer=el('button','btn','重置計時');
+  startTimer.onclick=()=>{if(timerRunning){stopEssayTimer();timerRunning=false;startTimer.textContent='繼續計時';timerStatus.textContent='已暫停';return}
+    if(remainingSeconds===0)remainingSeconds=durationSeconds;
+    stopEssayTimer();timerRunning=true;startTimer.textContent='暫停計時';timerStatus.textContent='計時中（切題會重置）';
+    timerDisplay.textContent=clockText(remainingSeconds);activeTimer=setInterval(tick,1000)};
+  resetTimer.onclick=()=>{stopEssayTimer();timerRunning=false;remainingSeconds=durationSeconds;timerDisplay.textContent=clockText(remainingSeconds);startTimer.textContent='開始計時';timerStatus.textContent='已重置'};
+  const timerLength=el('select','essay-timer-length');timerLength.setAttribute('aria-label','設定申論練習分鐘數');
+  for(const min of [10,15,20,25]){const option=el('option',null,`${min} 分鐘`);option.value=String(min);option.selected=min===15;timerLength.append(option)}
+  timerLength.onchange=()=>{durationSeconds=Number(timerLength.value)*60;resetTimer.onclick()};
+  timerBox.append(el('h3',null,'限時作答（可選）'),timerLength,timerDisplay,startTimer,resetTimer,timerStatus);
+
+  const layout=el('div','essay-grid'),nav=el('nav','essay-list'),work=el('section','essay-work');
   nav.setAttribute('aria-label','申論預測題清單');
+  const renderVisual=visual=>{
+    const wrap=el('section','essay-map');
+    wrap.append(el('div','essay-map-title',esc(visual.title)));
+    // 圖像的所有步驟皆來自既有校訂資料，不推導新的法律結論。
+    const total=visual.kind==='path'?visual.nodes.length:visual.lanes.reduce((v,x)=>v+x.points.length,0);
+    const controls=el('div','essay-visual-step');
+    const nextV=el('button','btn',visualCount>=total?'已全部顯示':'揭露下一格');nextV.disabled=visualCount>=total;
+    nextV.onclick=()=>{visualCount=Math.min(total,visualCount+1);draw()};
+    const allV=el('button','btn','全部顯示');allV.onclick=()=>{visualCount=total;draw()};
+    const resetV=el('button','btn','重新遮住');resetV.onclick=()=>{visualCount=0;draw()};
+    controls.append(nextV,allV,resetV,el('span',null,`已顯示 ${visualCount}／${total} 格`));wrap.append(controls);
+    if(visual.kind==='path'){
+      const flow=el('div','essay-path');
+      visual.nodes.forEach((v,i)=>{
+        const cell=el('div','essay-path-cell'+(i>=visualCount?' muted-visual':''),
+          `<span class="vicon" aria-hidden="true">${esc(v.icon)}</span><strong>${esc(v.title)}</strong><small>${esc(v.detail)}</small>`);
+        cell.setAttribute('aria-label',i<visualCount?`${i+1}：${v.title}，${v.detail}`:`第${i+1}格未揭露`);
+        flow.append(cell);
+      });wrap.append(flow);
+    }else{
+      const lanes=el('div','essay-lanes');let offset=0;
+      visual.lanes.forEach(lane=>{
+        const box=el('section','essay-lane'),items=el('ol');
+        lane.points.forEach((point,j)=>{
+          const revealed=offset+j<visualCount;
+          const item=el('li',null,revealed?esc(point):'＿＿＿（自行回想）');
+          item.setAttribute('aria-label',revealed?point:'尚未揭露');items.append(item);
+        });offset+=lane.points.length;
+        box.append(el('header',null,esc(lane.label)),items);lanes.append(box);
+      });wrap.append(lanes);
+    }
+    if(visualCount===total)wrap.append(el('p','essay-map-note',esc(visual.note)));
+    else wrap.append(el('p','essay-visual-note','依序在腦中先聯想下一步，再按「揭露下一格」。補充說明會在全部揭露後顯示。'));
+    return wrap;
+  };
   const draw=()=>{
     nav.replaceChildren(...list.map(x=>{
-      const b=el('button',null,`<small>預測 ${x.number} · ${esc(x.sourcePriority)} · ${S.essayKnown[x.id]?'已回想':'未回想'}</small>${esc(x.title)}`);
+      const info=grade(x)<0?'未測':grade(x)===2?'能回想':grade(x)===1?'提示回想':'尚未想起';
+      const b=el('button',null,`<small>第 ${x.number} 題 · 學習${esc(x.studyPriority)} · ${esc(info)}</small>${esc(x.title)}`);
       b.setAttribute('aria-current',x.id===chosen.id);
       b.onclick=()=>{S.essayPick[S.subject]=x.id;save();viewEssay(d,collection)};
       return b;
     }));
-    const scene=el('div','essay-scene',`<span class="essay-icon" aria-hidden="true">${esc(chosen.scene)}</span><div><strong>${esc(chosen.title)}</strong><div class="hint">圖像是題目聯想提示，不代表法律結論</div></div>`);
+    const scene=el('div','essay-scene',`<span class="essay-icon" aria-hidden="true">${esc(chosen.scene)}</span><div><strong>${esc(chosen.title)}</strong><div class="hint">用符號提取情境，不把圖像當法條或法律結論</div></div>`);
     const question=el('div','essay-question',esc(chosen.question));
-    const route=el('div','essay-route');route.setAttribute('aria-label','申論答案分段記憶路徑');
+    const route=el('div','essay-route');route.setAttribute('aria-live','polite');route.setAttribute('aria-label','申論答案分段回想路徑');
     chosen.steps.forEach((step,i)=>{
       const shown=i<revealed;
-      const node=el('div','essay-step'+(shown?'':' pending'),`<span class="seq">${i+1}</span><span>${shown?esc(step):'第 '+(i+1)+' 段：先自行回想'}</span>`);
-      node.style.animationDelay=shown?Math.min(i,5)*40+'ms':'0ms';route.append(node);
+      const item=el('div','essay-step'+(shown?'':' pending'),`<span class="seq">${i+1}</span><span>${shown?esc(step):'第 '+(i+1)+' 段：先獨立回想'}</span>`);
+      item.style.animationDelay=shown?Math.min(i,5)*35+'ms':'0ms';route.append(item);
     });
     const actions=el('div','essay-action');
     const next=el('button','btn good',revealed>=chosen.steps.length?'已全部揭露':'揭露下一段');next.disabled=revealed>=chosen.steps.length;
     next.onclick=()=>{revealed=Math.min(chosen.steps.length,revealed+1);draw()};
-    const show=el('button','btn','全部顯示');show.onclick=()=>{revealed=chosen.steps.length;draw()};
-    const reset=el('button','btn','重新回想');reset.onclick=()=>{revealed=0;draw()};
-    const mark=el('button','btn',S.essayKnown[chosen.id]?'取消已回想':'標記已回想');
-    mark.setAttribute('aria-pressed',!!S.essayKnown[chosen.id]);
-    mark.onclick=()=>{if(S.essayKnown[chosen.id])delete S.essayKnown[chosen.id];else S.essayKnown[chosen.id]=1;save();draw()};
-    const link=el('button','btn','前往相關記憶樹章節');link.onclick=()=>{
+    const show=el('button','btn','揭露全部');show.onclick=()=>{revealed=chosen.steps.length;draw()};
+    const reset=el('button','btn','重新默背');reset.onclick=()=>{revealed=0;mapVisible=false;answerVisible=false;visualCount=0;checkedSteps.clear();draw()};
+    actions.append(next,show,reset);
+    if(chosen.visual){
+      const visual=el('button','btn',mapVisible?'收起情境圖':'開啟圖像記憶');
+      visual.setAttribute('aria-expanded',mapVisible);
+      visual.onclick=()=>{mapVisible=!mapVisible;draw()};actions.append(visual);
+    }
+    const link=el('button','btn','前往記憶樹');link.onclick=()=>{
       S.ch[S.subject]=chosen.chapter;S.mode='tree';$('#q').value='';render();window.scrollTo({top:0,behavior:'auto'});
+    };actions.append(link);
+    const compose=el('section','essay-compose');
+    const composeHead=el('div','essay-compose-head');composeHead.append(el('h3',null,'先寫出骨架（不顯示標準答案）'));
+    const counter=el('span','count',`${draftText.length} 字`);composeHead.append(counter);
+    const textarea=el('textarea');textarea.setAttribute('aria-label','我的申論默寫草稿');
+    textarea.setAttribute('placeholder','試著寫下：一、破題與法源；（一）第一個要件；（二）第二個爭點；最後是結論。可先只寫小標，再逐次補上涵攝。');
+    textarea.maxLength=5000;textarea.value=draftText;
+    textarea.oninput=()=>{draftText=textarea.value;counter.textContent=`${draftText.length} 字`};
+    const composeBtns=el('div','actions');
+    const persist=el('button','btn','僅儲存在此裝置');
+    const draftStatus=el('span','essay-notice','草稿預設不會自動儲存；自選儲存後，可再次進入本題接續。');
+    persist.onclick=()=>{essayDrafts[chosen.id]=draftText.slice(0,5000);
+      draftStatus.textContent=saveDrafts()?'已儲存在本裝置瀏覽器（不會上傳）':'瀏覽器拒絕儲存；請先複製草稿備份'};
+    const copy=el('button','btn','複製我的草稿');copy.onclick=()=>{
+      if(navigator.clipboard?.writeText)navigator.clipboard.writeText(draftText).then(()=>{draftStatus.textContent='已複製草稿'},()=>{draftStatus.textContent='複製失敗，請手動選取文字'});
+      else{textarea.focus();textarea.select();draftStatus.textContent='請使用裝置的複製功能'}
     };
-    actions.append(next,show,reset,mark,link);
-    const caution=el('p','essay-notice',`原始來源：${esc(chosen.source)}。路徑為原參考答案的 ${chosen.steps.length} 個第一層小標題；${chosen.hasCaution?'<strong>原稿含 ⚠ 待查項目，請勿視為已查證完成。</strong>':'法條細節仍請以原稿及官方法源複核。'}`);
-    work.replaceChildren(scene,el('p','lead',`題 ${chosen.number}　｜　原稿主觀分類：${esc(chosen.sourcePriority)}　｜　${chosen.steps.length} 段答題骨架`),question,route,actions,caution);
+    const clear=el('button','btn','清除本題草稿');clear.onclick=()=>{draftText='';textarea.value='';counter.textContent='0 字';delete essayDrafts[chosen.id];saveDrafts();draftStatus.textContent='本題草稿已清除'};
+    composeBtns.append(persist,copy,clear);compose.append(composeHead,textarea,composeBtns,draftStatus);
+    const progress=el('div','essay-progress',`<i style="width:${(revealed/chosen.steps.length*100).toFixed(1)}%"></i>`);
+    progress.setAttribute('role','progressbar');progress.setAttribute('aria-valuenow',revealed);progress.setAttribute('aria-valuemax',chosen.steps.length);
+    const content=[scene,el('p','lead',`預測 ${chosen.number}｜原稿主觀分類 ${esc(chosen.sourcePriority)}｜學習排序 ${esc(chosen.studyPriority)}｜${chosen.steps.length} 段架構`),question,timerBox,compose,progress,route,actions];
+    if(mapVisible&&chosen.visual)content.push(renderVisual(chosen.visual));
+    const button=el('button','btn',answerVisible?'收起校訂參考答案':'顯示校訂參考答案');
+    button.disabled=revealed<chosen.steps.length;button.setAttribute('aria-expanded',answerVisible);
+    button.onclick=()=>{answerVisible=!answerVisible;draw()};
+    content.push(el('p','essay-source-note','完整參考答案先不要看，嘗試把每個小標延伸為法源、要件、涵攝與結論。'),button);
+    if(answerVisible){
+      content.push(el('div','essay-answer',esc(chosen.answer)));
+      const audit=el('section','essay-selfcheck');audit.append(el('h3',null,'自己核對得分骨架（非 AI 自動閱卷）'));
+      const state=el('span','essay-notice',`${checkedSteps.size} / ${chosen.steps.length} 段能獨立寫出`);
+      chosen.steps.forEach((step,i)=>{
+        const line=el('label','essay-checkline'),box=el('input');box.type='checkbox';box.checked=checkedSteps.has(i);
+        box.onchange=()=>{box.checked?checkedSteps.add(i):checkedSteps.delete(i);
+          state.textContent=`${checkedSteps.size} / ${chosen.steps.length} 段能獨立寫出`};
+        line.append(box,el('span',null,esc(step)));audit.append(line);
+      });
+      audit.append(state,el('p','essay-source-note','勾選代表你能不看答案寫出該段「法源、要件、涵攝、結論」；這只是自行檢核，不等於正式考試分數。'));
+      content.push(audit);
+    }
+    const g=grade(chosen),record=recall(chosen);
+    const gradeBox=el('div','essay-grade');gradeBox.append(el('div','essay-grade-title','本次自我回想程度（儲存於本裝置）'));
+    [['0','想不起來｜立即重練'],['1','有提示才想起｜明天'],['2','可獨立回想｜3天後']].forEach(([score,label])=>{
+      const b=el('button','btn',label);b.setAttribute('aria-pressed',g===Number(score));
+      b.onclick=()=>{const n=Number(score);const ms=n===0?0:n===1?86400000:3*86400000;
+        S.essayRecall[chosen.id]={grade:n,at:Date.now(),dueAt:Date.now()+ms};
+        if(n===2)S.essayKnown[chosen.id]=1;else delete S.essayKnown[chosen.id];
+        save();viewEssay(d,collection);
+      };gradeBox.append(b);
+    });
+    content.push(gradeBox);
+    const errorBox=el('section','essay-compose essay-errors'),errorTitle=el('h3',null,'本題錯漏註記（只存在此裝置）');
+    const errorField=el('textarea');errorField.maxLength=1200;errorField.value=errorText;
+    errorField.setAttribute('aria-label','本題錯漏註記');errorField.placeholder='例如：漏寫 §158-4 權衡、混淆 131Ⅰ 與 131Ⅱ。這是個人註記，不是自動批改。';
+    errorField.oninput=()=>{errorText=errorField.value};
+    const saveError=el('button','btn','儲存錯漏'),removeError=el('button','btn','清除註記'),errorStatus=el('span','essay-notice','儲存後可用「錯漏註記」篩選。');
+    saveError.onclick=()=>{if(errorText.trim())essayErrors[chosen.id]=errorText.slice(0,1200);else delete essayErrors[chosen.id];errorStatus.textContent=saveErrors()?'已儲存錯漏註記':'裝置拒絕儲存，請自行備份'};
+    removeError.onclick=()=>{errorText='';errorField.value='';delete essayErrors[chosen.id];saveErrors();errorStatus.textContent='已清除註記'};
+    const errorActions=el('div','actions');errorActions.append(saveError,removeError);errorBox.append(errorTitle,errorField,errorActions,errorStatus);content.push(errorBox);
+
+    if(record)content.push(el('p','essay-review',`上次評分：${g===2?'能完整回想':g===1?'需提示':'尚未想起'}。${due(chosen)?'目前需複習':'尚未到下一次複習日'}。複習間隔只是提醒策略，可隨時提前練習。`));
+    if(chosen.verifiedNote)content.push(el('p','essay-review','法源複核：'+esc(chosen.verifiedNote)));
+    const caution=chosen.hasCaution?'仍有尚未核定／爭議事項，切勿當作無條件標準答案。':'部分條文已核實，其他法律推論仍須視具體事實。';
+    content.push(el('p','essay-notice',`原始檔：${esc(chosen.source)}。本題修訂基於原答案，不代表對全部法條或案例逐項完成終局查證。${caution}`));
+    if(chosen.sources?.length){
+      const refs=el('div','essay-source-links');
+      chosen.sources.forEach(source=>{
+        if(!source.url.startsWith('https://'))return;
+        const a=el('a',null,esc(source.label));a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';refs.append(a);
+      });content.push(refs);
+    }
+    work.replaceChildren(...content);
   };
-  layout.append(nav,work);m.replaceChildren(heading,intro,layout);draw();
+  layout.append(nav,work);m.replaceChildren(heading,intro,toolbar,layout);draw();
 }
 
 function viewCompare(d){
@@ -345,14 +564,15 @@ function viewSearch(d,q){
 }
 async function render(){
   save();header();
+  document.querySelector('.wrap').classList.toggle('essay-layout',S.mode==='essay'&&!$('#q').value.trim());
   let d;try{d=await load(S.subject)}catch(e){$("#main").replaceChildren(el("p","empty","這一科的資料沒有載入成功，請重新整理頁面。"));return}
   const c=toc(d),q=$("#q").value.trim();
-  if(q)return viewSearch(d,q);
+  if(q){stopEssayTimer();return viewSearch(d,q)}
   if(S.mode==='essay'){
     try{return viewEssay(d,await loadEssays())}
     catch(e){$("#main").replaceChildren(el('p','empty','申論連結資料載入失敗，請確認 data/essay-memory.json 已與頁面一起部署。'));return}
   }
-  ({tree:()=>viewTree(d,c),cards:()=>viewCards(d),compare:()=>viewCompare(d),numbers:()=>viewNumbers(d),updates:()=>viewUpdates(d)})[S.mode]();
+  stopEssayTimer();({tree:()=>viewTree(d,c),cards:()=>viewCards(d),compare:()=>viewCompare(d),numbers:()=>viewNumbers(d),updates:()=>viewUpdates(d)})[S.mode]();
 }
 $("#recite").onclick=()=>{S.recite=!S.recite;render()};
 $("#eink").onclick=()=>{S.eink=!S.eink;render()};
