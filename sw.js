@@ -1,5 +1,5 @@
 // 版本號沿用本專案日期＋字母規則；CacheStorage 對同一來源的其他 PWA 共用，勿刪除其他專案快取。
-const V = 'tb-2026-10-18h';
+const V = 'tb-2026-10-18i';
 const CACHE = 'promotion-' + V;
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'data/criminal.json', 'data/procedure.json', 'data/duty.json', 'data/essay-memory.json'];
