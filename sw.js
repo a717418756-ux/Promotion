@@ -1,8 +1,8 @@
 // 版本號沿用本專案日期＋字母規則；CacheStorage 對同一來源的其他 PWA 共用，勿刪除其他專案快取。
-const V = 'tb-2026-10-18i';
+const V = 'tb-2026-10-20e';
 const CACHE = 'promotion-' + V;
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
-  'data/criminal.json', 'data/procedure.json', 'data/duty.json', 'data/essay-memory.json'];
+  'data/criminal.json', 'data/procedure.json', 'data/duty.json', 'data/essay-memory.json', 'data/laws.json'];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(names => Promise.all(
   names.filter(name => name.startsWith('promotion-') && name !== CACHE).map(name => caches.delete(name))

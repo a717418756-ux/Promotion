@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="記憶樹">
-<title>升官等記憶樹｜i 候選測試版</title>
+<title>升官等記憶樹</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
@@ -235,6 +235,42 @@ body{margin:0}
 .data-help p,.data-help li{font-size:13px;line-height:1.8}
 .data-help::backdrop{background:#0009}
 @media(max-width:670px){.data-tools .chip{font-size:12px;padding:2px 8px}.data-help{max-width:calc(100% - 24px)}}
+
+/* 20a：法條全文、朗讀、挖空回想 */
+.bar-in{grid-template-columns:minmax(0,1fr)}
+.modes{min-width:0;flex:0 1 auto}
+.lawlink{font:inherit;color:var(--jade);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.ref .lawlink{font:inherit}
+.hid .lawlink{color:inherit;text-decoration:none}
+.law-dialog{border:1px solid var(--line);border-radius:10px;padding:0;background:var(--panel);color:var(--ink);width:min(640px,calc(100% - 24px));max-height:85vh}
+.law-dialog::backdrop{background:#0009}
+.law-dialog header{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:14px 16px 8px;border-bottom:1px solid var(--line)}
+.law-dialog h2{margin:0;font:900 19px var(--f-display)}
+.law-dialog .ver{font-size:12px;color:var(--muted)}
+.law-text{white-space:pre-line;font:15px/1.9 var(--f-body);padding:12px 16px;max-height:55vh;overflow:auto;margin:0}
+.law-dialog .row{padding:10px 16px 14px;border-top:1px solid var(--line)}
+.law-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.law-tools select,.law-tools input,.tts-bar select{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:4px 8px;min-width:0}
+.law-tools input{flex:1 1 160px}
+.law-list{display:grid;gap:8px}
+.law-item{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.law-item h3{margin:0 0 4px;font:700 15px var(--f-display);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.law-item .d{font-size:14px;color:var(--ink)}
+.recite .law-item .d.hid{color:transparent;background:var(--hi);border-radius:3px;cursor:pointer;min-height:1.6em}
+.say{border:1px solid var(--line);background:var(--panel);border-radius:999px;font-size:12px;padding:1px 9px;cursor:pointer;white-space:nowrap}
+.tts-on{background:var(--amberbg)!important;box-shadow:inset 3px 0 var(--seal);border-radius:4px}
+.tts-bar{position:fixed;left:12px;right:12px;margin:0 auto;width:fit-content;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;background:var(--panel);border:1.5px solid var(--ink);border-radius:12px;padding:7px 10px;box-shadow:0 4px 18px #0003}
+.tts-bar .btn{padding:3px 9px;font-size:13px}
+.tts-bar select{font-size:13px;padding:3px 4px}
+.tts-bar .count{min-width:4em;text-align:center}
+.essay-answer .al{min-height:1.85em}
+.cz{border-radius:3px;cursor:pointer}
+.cz.hid{color:transparent!important;background:var(--hi);border-bottom:1.5px solid var(--seal);user-select:none}
+.cz.hid *{color:transparent!important;text-decoration:none}
+.cz.got{background:var(--jadebg)}
+body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
+:root[data-eink] .tts-bar{box-shadow:none}
+:root[data-eink] .tts-on{background:none!important;text-decoration:underline 2px}
 </style>
 
 </head>
@@ -242,7 +278,7 @@ body{margin:0}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · i 候選測試版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-20e</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools">
         <button class="chip" id="recite" aria-pressed="false">背誦模式</button>
@@ -268,8 +304,22 @@ body{margin:0}
   <p><strong>還原：</strong>按「匯入備份」選擇前述 JSON 檔；先經確認後合併本裝置的紀錄，<strong>同題衝突時以匯入檔案內容為準</strong>。匯入前請先匯出目前資料以防意外。</p>
   <p><strong>隱私：</strong>備份與匯入在本機執行，不傳送到伺服器；未按「儲存」的默寫或錯漏，只暫留於目前開啟的頁面記憶體，重整後可能遺失。</p>
   <p><strong>離線：</strong>使用 HTTPS 的正式或測試網站首次開啟並讓資料載入後，才能檢驗離線功能。直接雙擊 HTML 檔不等於已安裝 PWA。</p>
+  <p><strong>法條全文：</strong>綠色虛底線的條號可點開全文（只連結寫明法名者，例如「刑法第302條」「刑訴§230」）；「法條」分頁可依條號或關鍵字查詢、背誦模式遮住條文、連續朗讀。</p>
+  <p><strong>朗讀：</strong>使用裝置內建語音（需中文語音包；離線可用與否依裝置）。底部控制列可暫停、上下段、調語速與「題答間停頓」，停頓時間就是自我回想時間。</p>
+  <p><strong>挖空回想：</strong>申論答案可遮住條號、判決字號與時限數字，先想再點，點開即計入已揭示。</p>
   <form method="dialog"><button class="btn">關閉</button></form>
 </dialog>
+<dialog class="law-dialog" id="law-dialog" aria-labelledby="law-title">
+  <header><h2 id="law-title"></h2><span class="ver" id="law-ver"></span></header>
+  <p class="law-text" id="law-text"></p>
+  <div class="row"><button class="btn" id="law-prev">前一條</button><button class="btn" id="law-next">後一條</button><button class="btn good" id="law-say">朗讀</button><form method="dialog" style="margin-left:auto"><button class="btn">關閉</button></form></div>
+</dialog>
+<div class="tts-bar" id="tts-bar" hidden role="region" aria-label="朗讀控制">
+  <button class="btn" id="tts-prev" aria-label="上一段">⏮</button><button class="btn good" id="tts-toggle">暫停</button><button class="btn" id="tts-next" aria-label="下一段">⏭</button><button class="btn bad" id="tts-stop">停止</button>
+  <span class="count" id="tts-pos"></span>
+  <select id="tts-rate" aria-label="語速"><option value="0.8">0.8×</option><option value="1">1×</option><option value="1.2">1.2×</option><option value="1.5">1.5×</option></select>
+  <select id="tts-gap" aria-label="題答間停頓"><option value="0">不停頓</option><option value="3">停3秒</option><option value="5">停5秒</option><option value="8">停8秒</option></select>
+</div>
 <div class="wrap">
   <aside><nav class="toc" id="toc" aria-label="章節"></nav></aside>
   <main id="main"><p class="empty">載入中…</p></main>
@@ -277,7 +327,7 @@ body{margin:0}
 
 <script>
 const SUBJECTS=[["criminal","刑法"],["procedure","刑訴"],["duty","勤務"]];
-const MODES=[["essay","申論訓練"],["tree","樹狀"],["cards","閃卡"],["compare","對照"],["numbers","數字"],["updates","新法"]];
+const MODES=[["essay","申論訓練"],["tree","樹狀"],["cards","閃卡"],["laws","法條"],["compare","對照"],["numbers","數字"],["updates","新法"]];
 const $=s=>document.querySelector(s), el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let S={subject:"criminal",mode:"essay",ch:{},recite:false,eink:false,known:{},cards:{},onlyWeak:false};
@@ -320,6 +370,128 @@ async function load(id){
 }
 const nodesOf=c=>{const a=[];const w=ns=>ns.forEach(n=>{a.push(n);n.c&&w(n.c)});w(c.tree||[]);return a};
 
+/* 20a：法條全文（只連結明示法名之條號）、朗讀（瀏覽器內建語音，離線可用與否視裝置語音包）、挖空回想。 */
+const LAW_ALIAS={'刑法施行法':'刑法施行法','刑事訴訟法':'刑事訴訟法','刑訴法':'刑事訴訟法','刑訴':'刑事訴訟法','刑法':'刑法','跟蹤騷擾防制法':'跟蹤騷擾防制法','跟騷法':'跟蹤騷擾防制法','詐欺犯罪危害防制條例':'詐欺犯罪危害防制條例','詐欺條例':'詐欺犯罪危害防制條例','詐防條例':'詐欺犯罪危害防制條例','貪污治罪條例':'貪污治罪條例','貪污條例':'貪污治罪條例','洗錢防制法':'洗錢防制法','洗錢法':'洗錢防制法','警察勤務條例':'警察勤務條例','勤務條例':'警察勤務條例','警察職權行使法':'警察職權行使法','警職法':'警察職權行使法','警察法施行細則':'警察法施行細則','警察法':'警察法','警察勤務區訪查辦法':'警察勤務區訪查辦法','訪查辦法':'警察勤務區訪查辦法','治安顧慮人口查訪辦法':'治安顧慮人口查訪辦法','查訪辦法':'治安顧慮人口查訪辦法','集會遊行法':'集會遊行法','集遊法':'集會遊行法','警械使用條例':'警械使用條例','社會秩序維護法':'社會秩序維護法','社維法':'社會秩序維護法','行政程序法':'行政程序法','行政罰法':'行政罰法','行政執行法':'行政執行法','道路交通管理處罰條例':'道路交通管理處罰條例','道交條例':'道路交通管理處罰條例','公務人員保障法':'公務人員保障法','刑事妥速審判法':'刑事妥速審判法','妥速審判法':'刑事妥速審判法','通訊保障及監察法':'通訊保障及監察法','通保法':'通訊保障及監察法','家庭暴力防治法':'家庭暴力防治法','家暴法':'家庭暴力防治法','兒童及少年福利與權益保障法':'兒童及少年福利與權益保障法','兒少權益保障法':'兒童及少年福利與權益保障法','兒少權法':'兒童及少年福利與權益保障法','檢察官與司法警察機關執行職務聯繫辦法':'檢察官與司法警察機關執行職務聯繫辦法','聯繫辦法':'檢察官與司法警察機關執行職務聯繫辦法'};
+const LAW_KEYS=Object.keys(LAW_ALIAS).sort((a,b)=>b.length-a.length);
+const SUBJECT_LAW={criminal:'刑法',procedure:'刑事訴訟法'};
+// ref 欄（如「刑訴§230、§231」）：同一字串內未寫法名者沿用前一個法名；未收錄之法規不連結。
+const parseRefs=s=>{const out=[];let last=null;
+  for(const m of String(s??'').matchAll(/([^\s§、；;，,／/～~（）()]*)§(\d+)(?:-(\d+))?/g)){
+    const key=m[1]?LAW_KEYS.find(k=>m[1].endsWith(k)):null,law=m[1]?(key?LAW_ALIAS[key]:null):last;last=law;
+    if(law)out.push({i:m.index+(key?m[1].length-key.length:m[1].length),j:m.index+m[0].length,law,a:m[2]+(m[3]?'-'+m[3]:'')})}
+  return out};
+// 申論文字：連結「法名＋第N條」及其以「、及或至」串列者；未寫法名者，僅在所屬段落（一、／（一）／綜上）未提及任何他法或條例時，才依本科預設法（刑法／刑訴）連結；勤務科引用法規繁多，不預設。
+const PROSE_RE=new RegExp(`(${LAW_KEYS.join('|')})?第(\\d+)條(?:之(\\d+))?`,'g');
+const OTHER_RE=/([一-鿿]{2,}?(?:法|條例|辦法|規則|要點|細則|規定))第\d+條/g;
+const BLOCK_RE=/^(?:[一二三四五六七八九十]+、|（[一二三四五六七八九十]+）|綜上)/;
+const parseProse=(s,def)=>{s=String(s??'');const out=[],clean=[];let last=null,pos=0,off=0,ok=true;
+  if(def)for(const l of s.split('\n')){if(BLOCK_RE.test(l)||!clean.length){ok=true;clean.push([off,true])}
+    const lx=LAW_KEYS.filter(k=>LAW_ALIAS[k]===def).reduce((t,k)=>t.split(k).join('〇'),l);
+    const other=[...lx.matchAll(OTHER_RE)].length>0||LAW_KEYS.some(k=>LAW_ALIAS[k]!==def&&lx.includes(k))||lx.includes('條例');
+    if(other)clean[clean.length-1][1]=false
+    off+=l.length+1}
+  const plain=i=>{let r=false;for(const[o,c]of clean){if(o>i)break;r=c}return r};
+  for(const m of s.matchAll(PROSE_RE)){const gap=s.slice(pos,m.index);
+    const law=m[1]?LAW_ALIAS[m[1]]:(last&&/^(第\d+項)?(第\d+款)?(前段|後段|但書)?(、|及|或|至)$/.test(gap)?last:(def&&plain(m.index)?def:null));
+    if(law)out.push({i:m.index,j:m.index+m[0].length,law,a:m[2]+(m[3]?'-'+m[3]:'')});last=law;pos=m.index+m[0].length}
+  return out};
+const linkHtml=(s,parse)=>{s=String(s??'');let h='',p=0;
+  for(const t of parse(s)){h+=esc(s.slice(p,t.i))+`<button type="button" class="lawlink" data-law="${esc(t.law)}" data-a="${t.a}">${esc(s.slice(t.i,t.j))}</button>`;p=t.j}
+  return h+esc(s.slice(p))};
+const linkRefs=s=>linkHtml(s,parseRefs), linkLaw=(s,def)=>linkHtml(s,t=>parseProse(t,def));
+let LAWS;
+async function loadLaws(){if(LAWS)return LAWS;const r=await fetch('data/laws.json');if(!r.ok)throw new Error(r.status);return LAWS=(await r.json()).laws}
+const artName=a=>'第'+a.replace('-','條之')+(a.includes('-')?'':'條');
+let lawAt=null;
+async function openLaw(law,a){
+  try{await loadLaws()}catch(e){alert('法條資料載入失敗');return}
+  const L=LAWS[law],keys=L?Object.keys(L.a):[];lawAt={law,a};
+  $('#law-title').textContent=`${law} ${artName(a)}`;$('#law-ver').textContent=L?`（${L.date} 版）`:'';
+  $('#law-text').textContent=L?.a[a]??'本條未收錄於目前法規資料（可能為條號引用錯誤或條文已刪除）。';
+  const k=keys.indexOf(a);$('#law-prev').disabled=k<1;$('#law-next').disabled=k<0||k>=keys.length-1;
+  $('#law-prev').onclick=()=>openLaw(law,keys[k-1]);$('#law-next').onclick=()=>openLaw(law,keys[k+1]);
+  $('#law-say').onclick=()=>ttsPlay([{text:`${law}${artName(a)}。${L?.a[a]||''}`,el:$('#law-text')}]);
+  if(!$('#law-dialog').open)$('#law-dialog').showModal();
+}
+$('#law-dialog').addEventListener('close',()=>{if(TTS.items[0]?.el===$('#law-text'))ttsStop()});
+// 擷取階段處理：遮住的挖空先揭示；未遮住的條號開全文，不觸發所在卡片的翻面。
+document.addEventListener('click',e=>{
+  const cz=e.target.closest('.cz.hid');if(cz){e.stopPropagation();e.preventDefault();cz.classList.replace('hid','got');cz.closest('[data-cz]')?.dispatchEvent(new Event('czchange'));return}
+  const b=e.target.closest('.lawlink');if(b&&!b.closest('.hid')){e.stopPropagation();e.preventDefault();openLaw(b.dataset.law,b.dataset.a)}
+},true);
+// 挖空：條號（含連結之法名）、判決字號、時限數字。
+const CZ_RE=/<button class="lawlink"[^>]*>.*?<\/button>(?:第\d+項)?(?:第\d+款)?|第\d+條(?:之\d+)?(?:第\d+項)?(?:第\d+款)?|\d+年度?[一-鿿]{1,3}字第\d+號|\d{1,3}(?:台上|台非|台抗|上|非)\d+|\d{1,2}(?:個月|小時|分鐘|日|年|歲)|\d+萬元/g;
+const clozeHtml=h=>h.replace(CZ_RE,x=>`<span class="cz hid">${x}</span>`);
+
+/* 朗讀：分句播放、逐段標示；暫停＝停在本段，繼續時由本段重讀。 */
+const TTS={items:[],i:0,on:false,paused:false,token:0,timer:0};
+const ROMAN='ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ',CIRC='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
+const sayText=s=>String(s??'').replace(/§(\d+)-(\d+)/g,'第$1條之$2').replace(/§(\d+)/g,'第$1條').replace(/[Ⅰ-Ⅹ]/g,c=>`第${ROMAN.indexOf(c)+1}項`).replace(/[①-⑳]/g,c=>`第${CIRC.indexOf(c)+1}款`).replace(/[／/]/g,'，').replace(/→/g,'，').replace(/＋/g,'加').replace(/[～~]/g,'至');
+const chunks=s=>s.split(/(?<=[。；！？\n])/).flatMap(x=>x.length<=120?[x]:x.split(/(?<=，)/)).map(x=>x.trim()).filter(Boolean);
+const ttsVoice=()=>{const v=speechSynthesis.getVoices();return v.find(x=>/zh[-_]TW/i.test(x.lang))||v.find(x=>/^(zh|cmn)/i.test(x.lang))};
+function ttsBar(){const on=TTS.on||TTS.paused;$('#tts-bar').hidden=!on;if(!on)return;
+  $('#tts-toggle').textContent=TTS.paused?'繼續':'暫停';$('#tts-pos').textContent=`${Math.min(TTS.i+1,TTS.items.length)} / ${TTS.items.length}`;
+  $('#tts-rate').value=String(S.ttsRate||1);$('#tts-gap').value=String(S.ttsGap??3)}
+function ttsMark(it){document.querySelectorAll('.tts-on').forEach(x=>x.classList.remove('tts-on'));const e=typeof it?.el==='function'?it.el():it?.el;
+  if(e){e.classList.add('tts-on');e.scrollIntoView({block:'nearest',behavior:S.eink?'auto':'smooth'})}}
+function ttsRun(){const tk=++TTS.token,it=TTS.items[TTS.i];clearTimeout(TTS.timer);speechSynthesis.cancel();
+  if(!it){ttsStop();return}
+  it.before?.();ttsMark(it);ttsBar();
+  const parts=chunks(sayText(it.text));let k=0;
+  const say=()=>{if(tk!==TTS.token)return;
+    if(k>=parts.length){TTS.timer=setTimeout(()=>{if(tk===TTS.token){TTS.i++;ttsRun()}},it.gap?.()??400);return}
+    const u=new SpeechSynthesisUtterance(parts[k++]);u.lang='zh-TW';const v=ttsVoice();if(v)u.voice=v;u.rate=Number(S.ttsRate||1);
+    u.onend=say;u.onerror=say;speechSynthesis.speak(u)};
+  say()}
+function ttsPlay(items,start=0){if(!('speechSynthesis' in window)){alert('此瀏覽器不支援朗讀（Web Speech）。');return}
+  if(!items.length)return;TTS.items=items;TTS.i=start;TTS.on=true;TTS.paused=false;ttsRun()}
+function ttsStop(){TTS.token++;clearTimeout(TTS.timer);if('speechSynthesis' in window)speechSynthesis.cancel();TTS.on=TTS.paused=false;ttsMark(null);ttsBar()}
+$('#tts-toggle').onclick=()=>{if(TTS.paused){TTS.paused=false;TTS.on=true;ttsRun()}else{TTS.token++;clearTimeout(TTS.timer);speechSynthesis.cancel();TTS.paused=true;TTS.on=false;ttsBar()}};
+$('#tts-prev').onclick=()=>{TTS.i=Math.max(0,TTS.i-1);TTS.on=true;TTS.paused=false;ttsRun()};
+$('#tts-next').onclick=()=>{TTS.i=Math.min(TTS.items.length-1,TTS.i+1);TTS.on=true;TTS.paused=false;ttsRun()};
+$('#tts-stop').onclick=ttsStop;
+$('#tts-rate').onchange=e=>{S.ttsRate=Number(e.target.value);save()};
+$('#tts-gap').onchange=e=>{S.ttsGap=Number(e.target.value);save()};
+const gapMs=()=>(S.ttsGap??3)*1000;
+const sayBtn=(label,fn)=>{const b=el('button','say','🔊 '+label);b.onclick=e=>{e.stopPropagation();fn()};return b};
+
+function viewLaws(d){
+  const m=$('#main');m.className=S.recite?'recite':'';
+  const head=[el('h2','ch','法條全文'),el('p','lead','條文逐字收錄並標示版本日期。開啟「背誦模式」會遮住條文，先回想再點開；「連續朗讀」先唸條號、停頓後再唸條文。')];
+  const box=el('div','law-list');m.replaceChildren(...head,el('p','empty','載入中…'));
+  loadLaws().then(L=>{
+    const used=new Map();
+    const add=(t,parse)=>parse(t).forEach(x=>{if(L[x.law]?.a[x.a]){if(!used.has(x.law))used.set(x.law,new Set());used.get(x.law).add(x.a)}});
+    d.chapters.forEach(c=>nodesOf(c).forEach(n=>{add(n.ref,parseRefs);add(n.d,parseProse)}));
+    d.cards.forEach(x=>{add(x.ref,parseRefs);add(x.a,parseProse)});
+    ESSAY_DATA?.items.filter(x=>x.subject===S.subject).forEach(x=>add(x.answer,t=>parseProse(t,SUBJECT_LAW[S.subject])));
+    S.lawPick||={};const pick=()=>L[S.lawPick[S.subject]]?S.lawPick[S.subject]:({duty:'警察勤務條例'}[S.subject]||SUBJECT_LAW[S.subject]);
+    const sel=el('select');Object.keys(L).forEach(k=>{const o=el('option',null,`${esc(k)}（${esc(L[k].date)}）`);o.value=k;o.selected=k===pick();sel.append(o)});
+    const q=el('input');q.type='search';q.placeholder='條號（如 125、185-4）或關鍵字';q.value=S.lawQ||'';
+    const only=el('button','chip','只看本科引用');only.setAttribute('aria-pressed',S.lawOnlyUsed!==false);
+    const play=el('button','btn good','🔊 連續朗讀');
+    const tools=el('div','law-tools');tools.append(sel,q,only,play);
+    const note=el('p','essay-notice','刑法、刑訴、通保法、家暴法、聯繫辦法等12法依全國法規資料庫下載檔；勤務條例、警職法等14法取自你的 Y.C. 平台法規資料庫。');
+    let shown=[];
+    const draw=()=>{const law=pick(),A=L[law].a,set=used.get(law),term=(S.lawQ||'').trim();
+      let ks=Object.keys(A);const num=term.replace(/^第|條$/g,'').replace(/條之/,'-').replace(/^§/,'');
+      if(/^\d+(-\d+)?$/.test(num))ks=ks.filter(k=>k===num||k.startsWith(num+'-'));
+      else{if(term)ks=ks.filter(k=>A[k].includes(term));if(only.getAttribute('aria-pressed')==='true'&&set)ks=ks.filter(k=>set.has(k))}
+      shown=ks.slice(0,80);
+      box.replaceChildren(el('p','count',`${ks.length} 條${ks.length>80?'（顯示前 80 條，請以條號或關鍵字縮小）':''}${set?`｜本科引用 ${set.size} 條`:'｜本科未引用此法'}`),...shown.map(k=>{
+        const it=el('div','law-item'),h=el('h3',null,`${esc(artName(k))}`),t=el('div','d'+(S.recite?' hid':''),esc(A[k]));
+        t.onclick=()=>t.classList.toggle('hid');h.append(sayBtn('朗讀',()=>ttsPlay([{text:`${artName(k)}。${A[k]}`,el:it,before:()=>t.classList.remove('hid')}])));
+        it.dataset.k=k;it.append(h,t);return it}))};
+    sel.onchange=()=>{S.lawPick[S.subject]=sel.value;save();draw()};
+    let qt2;q.oninput=()=>{clearTimeout(qt2);qt2=setTimeout(()=>{S.lawQ=q.value;save();draw()},200)};
+    only.onclick=()=>{S.lawOnlyUsed=only.getAttribute('aria-pressed')!=='true';only.setAttribute('aria-pressed',S.lawOnlyUsed);save();draw()};
+    play.onclick=()=>{const items=[];box.querySelectorAll('.law-item').forEach(it=>{const t=it.querySelector('.d'),k=it.dataset.k;
+      items.push({text:artName(k),el:it,gap:gapMs},{text:L[pick()].a[k],el:it,before:()=>t.classList.remove('hid')})});ttsPlay(items)};
+    draw();m.replaceChildren(...head,tools,note,box);
+  }).catch(()=>m.replaceChildren(...head,el('p','empty','法條資料載入失敗，請確認 data/laws.json 已與頁面一起部署。')));
+}
+const ROWS=new Map();
+
 function header(){
   $("#subj").replaceChildren(...SUBJECTS.map(([id,n])=>{const b=el("button",null,n);b.setAttribute("aria-pressed",S.subject===id);b.onclick=()=>{S.subject=id;render()};return b}));
   $("#modes").replaceChildren(...MODES.map(([id,n])=>{const b=el("button",null,n);b.setAttribute("aria-pressed",S.mode===id&&!$("#q").value);b.onclick=()=>{S.mode=id;$("#q").value="";render()};return b}));
@@ -337,11 +509,11 @@ function toc(d){
 function nodeEl(n,lvl){
   const li=el("li","lvl"+lvl),row=el("div","node");
   const tw=el("button","tw",n.c?"▾":"•");tw.disabled=!n.c;tw.setAttribute("aria-label","展開或收合");
-  const lb=el("div","lbl",`<span class="t">${esc(n.t)}</span>${n.tag?`<span class="tag tag-${esc(n.tag)}">${esc(n.tag)}</span>`:""}${n.ref?`<span class="ref">${esc(n.ref)}</span>`:""}`);
-  if(n.d){const d=el("div","d"+(S.recite?" hid":""),esc(n.d));d.onclick=()=>d.classList.toggle("hid");lb.append(d)}
+  const lb=el("div","lbl",`<span class="t">${esc(n.t)}</span>${n.tag?`<span class="tag tag-${esc(n.tag)}">${esc(n.tag)}</span>`:""}${n.ref?`<span class="ref">${linkRefs(n.ref)}</span>`:""}`);
+  let dEl=null;if(n.d){const d=dEl=el("div","d"+(S.recite?" hid":""),linkLaw(n.d));d.onclick=()=>d.classList.toggle("hid");lb.append(d)}
   const kb=el("button","known",S.known[n.k]?"熟":"未熟");kb.setAttribute("aria-pressed",!!S.known[n.k]);
   kb.onclick=()=>{S.known[n.k]?delete S.known[n.k]:S.known[n.k]=1;save();kb.setAttribute("aria-pressed",!!S.known[n.k]);kb.textContent=S.known[n.k]?"熟":"未熟";updMeter()};
-  row.append(tw,lb,kb);li.append(row);
+  row.append(tw,lb,kb);li.append(row);ROWS.set(n.k,{row,d:dEl});
   if(n.c){const ul=el("ul");n.c.forEach(x=>ul.append(nodeEl(x,lvl+1)));li.append(ul);
     tw.onclick=()=>{ul.hidden=!ul.hidden;tw.textContent=ul.hidden?"▸":"▾"}}
   return li;
@@ -354,6 +526,8 @@ function viewTree(d,c){
   meta.append(el("span"));
   const all=el("button",null,"全部收合");all.onclick=()=>{const hide=all.textContent==="全部收合";m.querySelectorAll("ul.tree ul").forEach(u=>u.hidden=hide);m.querySelectorAll(".tw:not([disabled])").forEach(t=>t.textContent=hide?"▸":"▾");all.textContent=hide?"全部展開":"全部收合"};
   meta.append(all);
+  meta.append(sayBtn('朗讀本章',()=>ttsPlay(ns.flatMap(n=>{const x=ROWS.get(n.k);if(!x)return[];const q={text:n.t+(n.ref?'，'+n.ref:''),el:x.row,gap:n.d&&S.recite?gapMs:()=>300};
+    return n.d?[q,{text:n.d,el:x.row,before:()=>x.d.classList.remove('hid')}]:[q]}))));
   const ul=el("ul","tree");(c.tree||[]).forEach(n=>ul.append(nodeEl(n,0)));
   m.replaceChildren(el("h2","ch",esc(c.title)),...(c.lead?[el("p","lead",esc(c.lead))]:[]),meter,meta,ul);updMeter();
 }
@@ -367,13 +541,16 @@ function viewCards(d){
   const shuf=el("button","chip","洗牌");shuf.onclick=()=>{for(let j=list.length-1;j>0;j--){const r=Math.random()*(j+1)|0;[list[j],list[r]]=[list[r],list[j]]}i=0;draw()};
   const draw=()=>{if(!list.length){box.replaceChildren(el("p","empty","這一科的卡片都標成熟了。關掉「只看不熟」可以全部再看一次。"));ctr.textContent="";return}
     const x=list[i],ch=d.chapters.find(c=>c.id===x.ch);
-    const card=el("div","card",`<div class="count">${esc(ch?ch.title:"")}</div><div class="q">${esc(x.q)}</div>${open?`<div class="a">${esc(x.a)}${x.ref?` <span class="ref">${esc(x.ref)}</span>`:""}</div>`:`<div class="count">點卡片翻面</div>`}`);
+    const card=el("div","card",`<div class="count">${esc(ch?ch.title:"")}</div><div class="q">${esc(x.q)}</div>${open?`<div class="a">${linkLaw(x.a)}${x.ref?` <span class="ref">${linkRefs(x.ref)}</span>`:""}</div>`:`<div class="count">點卡片翻面</div>`}`);
     card.onclick=()=>{open=!open;draw()};
     const nav=el("div","row");const prev=el("button","btn","上一張"),bad=el("button","btn bad","不熟"),good=el("button","btn good","熟了");
     const go=s=>{i=(i+s+list.length)%list.length;open=false;draw()};
     prev.onclick=()=>go(-1);bad.onclick=()=>{S.cards[x.k]=0;save();go(1)};good.onclick=()=>{S.cards[x.k]=1;save();go(1)};
     nav.append(prev,bad,good);box.replaceChildren(card,nav);ctr.textContent=`${i+1} / ${list.length}　熟 ${list.filter(y=>S.cards[y.k]===1).length}`};
-  const tools=el("div","row");tools.append(weak,shuf,ctr);
+  const listen=sayBtn('聽讀連播',()=>ttsPlay(list.slice(i).flatMap(x=>[
+    {text:x.q,before:()=>{i=list.indexOf(x);open=false;draw()},el:()=>box.querySelector('.card'),gap:gapMs},
+    {text:x.a,before:()=>{open=true;draw()},el:()=>box.querySelector('.card'),gap:()=>1200}])));
+  const tools=el("div","row");tools.append(weak,shuf,listen,ctr);
   m.replaceChildren(el("h2","ch",`${esc(d.name)}閃卡`),tools,box);draw();
 }
 
@@ -470,7 +647,7 @@ function viewEssay(d,collection){
       return b;
     }));
     const scene=el('div','essay-scene',`<span class="essay-icon" aria-hidden="true">${esc(chosen.scene)}</span><div><strong>${esc(chosen.title)}</strong><div class="hint">用符號提取情境，不把圖像當法條或法律結論</div></div>`);
-    const question=el('div','essay-question',esc(chosen.question));
+    const question=el('div','essay-question',linkLaw(chosen.question));
     const route=el('div','essay-route');route.setAttribute('aria-live','polite');route.setAttribute('aria-label','申論答案分段回想路徑');
     chosen.steps.forEach((step,i)=>{
       const shown=i<revealed;
@@ -482,7 +659,7 @@ function viewEssay(d,collection){
     next.onclick=()=>{revealed=Math.min(chosen.steps.length,revealed+1);draw()};
     const show=el('button','btn','揭露全部');show.onclick=()=>{revealed=chosen.steps.length;draw()};
     const reset=el('button','btn','重新默背');reset.onclick=()=>{revealed=0;mapVisible=false;answerVisible=false;visualCount=0;checkedSteps.clear();draw()};
-    actions.append(next,show,reset);
+    actions.append(next,show,reset,sayBtn('唸題目',()=>ttsPlay([{text:chosen.question,el:question}])));
     if(chosen.visual){
       const visual=el('button','btn',mapVisible?'收起情境圖':'開啟圖像記憶');
       visual.setAttribute('aria-expanded',mapVisible);
@@ -518,7 +695,15 @@ function viewEssay(d,collection){
     button.onclick=()=>{answerVisible=!answerVisible;draw()};
     content.push(el('p','essay-source-note','完整參考答案先不要看，嘗試把每個小標延伸為法源、要件、涵攝與結論。'),button);
     if(answerVisible){
-      content.push(el('div','essay-answer',esc(chosen.answer)));
+      const ans=el('div','essay-answer');ans.dataset.cz='';
+      const ah=linkLaw(chosen.answer,SUBJECT_LAW[S.subject]).split('\n'),lines=chosen.answer.split('\n').map((t,k)=>{const l=el('div','al',S.essayCloze?clozeHtml(ah[k]):ah[k]);ans.append(l);return{t,l}});
+      const czInfo=el('span','essay-notice'),upd=()=>{const a=ans.querySelectorAll('.cz').length,h=ans.querySelectorAll('.cz.hid').length;czInfo.textContent=S.essayCloze?`挖空 ${a} 處｜已揭示 ${a-h} 處（先想再點）`:'底線綠字可點開法條全文'};
+      ans.addEventListener('czchange',upd);
+      const cz=el('button','btn',S.essayCloze?'取消挖空':'挖空回想');cz.title='遮住條號、判決字號與時限數字';cz.onclick=()=>{S.essayCloze=!S.essayCloze;save();draw()};
+      const czAll=el('button','btn','全部揭示');czAll.hidden=!S.essayCloze;czAll.onclick=()=>{ans.querySelectorAll('.cz.hid').forEach(x=>x.classList.replace('hid','got'));upd()};
+      const ansTools=el('div','essay-action');
+      ansTools.append(cz,czAll,sayBtn('朗讀答案',()=>ttsPlay(lines.filter(x=>x.t.trim()).map(x=>({text:x.t,el:x.l,before:()=>{x.l.querySelectorAll('.cz.hid').forEach(c=>c.classList.replace('hid','got'));upd()}})))),czInfo);
+      content.push(ansTools,ans);upd();
       const audit=el('section','essay-selfcheck');audit.append(el('h3',null,'自己核對得分骨架（非 AI 自動閱卷）'));
       const state=el('span','essay-notice',`${checkedSteps.size} / ${chosen.steps.length} 段能獨立寫出`);
       chosen.steps.forEach((step,i)=>{
@@ -576,12 +761,12 @@ function viewCompare(d){
 }
 function viewNumbers(d){
   const m=$("#main");m.className="";const box=el("div","nums");
-  d.numbers.forEach(x=>{const r=el("div","num",`<div>${esc(x.k)}</div>`);const v=el("div","v"+(S.recite?" hid":""),esc(x.v));v.onclick=()=>v.classList.toggle("hid");r.append(v);if(x.ref)r.append(el("span","ref",esc(x.ref)));box.append(r)});
+  d.numbers.forEach(x=>{const r=el("div","num",`<div>${esc(x.k)}</div>`);const v=el("div","v"+(S.recite?" hid":""),esc(x.v));v.onclick=()=>v.classList.toggle("hid");r.append(v);if(x.ref)r.append(el("span","ref",linkRefs(x.ref)));box.append(r)});
   m.replaceChildren(el("h2","ch",`${esc(d.name)}數字速記`),el("p","lead","開啟背誦模式會遮住數字，點一下顯示。"),box);
 }
 function viewUpdates(d){
   const m=$("#main");m.className="";const ul=el("ul","tl");
-  d.updates.forEach(x=>ul.append(el("li",null,`<div class="dt">${esc(x.date)}${x.ref?`<span class="ref">${esc(x.ref)}</span>`:""}</div><div>${esc(x.text)}</div>`)));
+  d.updates.forEach(x=>ul.append(el("li",null,`<div class="dt">${esc(x.date)}${x.ref?`<span class="ref">${linkRefs(x.ref)}</span>`:""}</div><div>${linkLaw(x.text)}</div>`)));
   m.replaceChildren(el("h2","ch",`${esc(d.name)}近年修法與憲判`),ul);
 }
 function viewSearch(d,q){
@@ -596,10 +781,12 @@ function viewSearch(d,q){
       b.style.textAlign='left';b.style.cursor='pointer';b.onclick=()=>{S.mode='essay';S.essayFilter='all';S.essayPick[S.subject]=x.id;$('#q').value='';render()};hits.push(b)
     }re.lastIndex=0;
   })}
+  const aq=q.replace(/^(§|第)/,'').replace(/條之/,'-').replace(/條$/,''),dl=SUBJECT_LAW[S.subject];
+  if(dl&&/^\d+(-\d+)?$/.test(aq)){const b=el('button','hit',`<div class="path">法條全文</div><span class="t">${esc(dl)} ${esc(artName(aq))}</span>`);b.style.textAlign='left';b.style.cursor='pointer';b.onclick=()=>openLaw(dl,aq);hits.unshift(b)}
   m.replaceChildren(el("h2","ch",`搜尋「${esc(q)}」`),el("p","lead",`${hits.length} 筆，範圍：${esc(d.name)}`),...(hits.length?hits:[el("p","empty","沒有符合的內容，試試條號（例如 §130）或較短的關鍵字。")]));
 }
 async function render(){
-  save();header();
+  ttsStop();save();header();
   document.querySelector('.wrap').classList.toggle('essay-layout',S.mode==='essay'&&!$('#q').value.trim());
   let d;try{d=await load(S.subject)}catch(e){$("#main").replaceChildren(el("p","empty","這一科的資料沒有載入成功，請重新整理頁面。"));return}
   const c=toc(d),q=$("#q").value.trim();
@@ -608,7 +795,7 @@ async function render(){
     try{return viewEssay(d,await loadEssays())}
     catch(e){$("#main").replaceChildren(el('p','empty','申論連結資料載入失敗，請確認 data/essay-memory.json 已與頁面一起部署。'));return}
   }
-  stopEssayTimer();({tree:()=>viewTree(d,c),cards:()=>viewCards(d),compare:()=>viewCompare(d),numbers:()=>viewNumbers(d),updates:()=>viewUpdates(d)})[S.mode]();
+  stopEssayTimer();({tree:()=>viewTree(d,c),cards:()=>viewCards(d),compare:()=>viewCompare(d),numbers:()=>viewNumbers(d),updates:()=>viewUpdates(d),laws:async()=>{try{await loadEssays()}catch(e){}viewLaws(d)}})[S.mode]();
 }
 $("#recite").onclick=()=>{S.recite=!S.recite;render()};
 $("#eink").onclick=()=>{S.eink=!S.eink;render()};
@@ -616,7 +803,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原（不需要網路，也不連至第三方服務）。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-18i';
+const BACKUP_APP_VERSION='tb-2026-10-20e';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
   'tb-v1':JSON.parse(JSON.stringify(S)),
