@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="記憶樹">
-<title>升官等記憶樹</title>
+<title>升官等記憶樹｜手機劇情候選版</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
@@ -271,16 +271,44 @@ body{margin:0}
 body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 :root[data-eink] .tts-bar{box-shadow:none}
 :root[data-eink] .tts-on{background:none!important;text-decoration:underline 2px}
+
+/* 平板與手機：避免工具列、章節與申論題目列表產生水平滑動。 */
+.mobile-mode-select,.mobile-tools-toggle{display:none}
+@media(max-width:760px){
+ .bar{padding-block:5px 5px}
+ .bar-in{gap:4px}
+ .top{gap:5px}
+ .brand{font-size:16px;letter-spacing:0}
+ .brand small{display:none}
+ .seg button{padding:5px 7px;font-size:12px}
+ .tools{gap:4px}
+ .tools>.chip{font-size:11px;padding:4px 7px}
+ .tools .data-tools{display:none}
+ .tools.tools-open .data-tools{display:grid;grid-template-columns:repeat(2,auto);gap:5px;position:absolute;right:8px;top:calc(100% - 3px);padding:10px;background:var(--panel);box-shadow:0 8px 20px #0004;border:1px solid var(--line);border-radius:10px;z-index:11}
+ .mobile-tools-toggle{display:inline-flex;align-items:center}
+ .modes{display:none}
+ .mobile-mode-select{display:block;min-width:0;flex:0 0 43%;max-width:45%;font:600 13px var(--f-body);color:var(--ink);background:var(--panel);padding:6px;border:1px solid var(--line);border-radius:8px}
+ .search{font-size:13px;min-width:0;flex:1 1 auto;max-width:100%}
+ .wrap{padding-left:10px;padding-right:10px;padding-top:10px;overflow-x:hidden}
+ .toc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-height:160px;overflow-y:auto;overflow-x:hidden}
+ .toc button{white-space:normal;min-width:0;font-size:12px;padding:5px}
+ .essay-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-height:153px;overflow-y:auto;overflow-x:hidden;gap:4px;padding:0}
+ .essay-list button{width:100%;min-width:0;max-width:none;white-space:normal;font-size:12px;padding:5px 6px}
+ .essay-list small{font-size:10px}
+}
+@media(max-width:390px){.brand{font-size:14px}.seg button{font-size:11px;padding:5px}.tools>.chip{font-size:10px;padding:4px 6px}.top{column-gap:4px}}
 </style>
 
+<link rel="stylesheet" href="story/vn.css">
 </head>
 <body>
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-20e</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-22d 劇情候選版</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
-      <div class="tools">
+      <div class="tools" id="top-tools">
+        <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
         <button class="chip" id="recite" aria-pressed="false">背誦模式</button>
         <button class="chip" id="eink" aria-pressed="false">電子紙</button>
         <div class="data-tools" role="group" aria-label="資料管理">
@@ -293,6 +321,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
     </div>
     <div class="top">
       <nav class="modes" id="modes" aria-label="檢視方式"></nav>
+      <select id="mode-select" class="mobile-mode-select" aria-label="切換學習模式"></select>
       <input class="search" id="q" type="search" placeholder="搜尋條號或關鍵字，例如 §130、夜間" aria-label="搜尋">
     </div>
   </div>
@@ -325,9 +354,10 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
   <main id="main"><p class="empty">載入中…</p></main>
 </div>
 
+<script src="story/vn.js"></script>
 <script>
 const SUBJECTS=[["criminal","刑法"],["procedure","刑訴"],["duty","勤務"]];
-const MODES=[["essay","申論訓練"],["tree","樹狀"],["cards","閃卡"],["laws","法條"],["compare","對照"],["numbers","數字"],["updates","新法"]];
+const MODES=[["vn","劇情遊戲"],["essay","申論訓練"],["tree","樹狀"],["cards","閃卡"],["laws","法條"],["compare","對照"],["numbers","數字"],["updates","新法"]];
 const $=s=>document.querySelector(s), el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let S={subject:"criminal",mode:"essay",ch:{},recite:false,eink:false,known:{},cards:{},onlyWeak:false};
@@ -493,6 +523,8 @@ function viewLaws(d){
 const ROWS=new Map();
 
 function header(){
+  const mobileMode=$("#mode-select");
+  mobileMode.replaceChildren(...MODES.map(([id,n])=>{const o=document.createElement("option");o.value=id;o.textContent=n;return o}));mobileMode.value=S.mode;
   $("#subj").replaceChildren(...SUBJECTS.map(([id,n])=>{const b=el("button",null,n);b.setAttribute("aria-pressed",S.subject===id);b.onclick=()=>{S.subject=id;render()};return b}));
   $("#modes").replaceChildren(...MODES.map(([id,n])=>{const b=el("button",null,n);b.setAttribute("aria-pressed",S.mode===id&&!$("#q").value);b.onclick=()=>{S.mode=id;$("#q").value="";render()};return b}));
   $("#recite").setAttribute("aria-pressed",S.recite);$("#eink").setAttribute("aria-pressed",S.eink);
@@ -786,29 +818,39 @@ function viewSearch(d,q){
   m.replaceChildren(el("h2","ch",`搜尋「${esc(q)}」`),el("p","lead",`${hits.length} 筆，範圍：${esc(d.name)}`),...(hits.length?hits:[el("p","empty","沒有符合的內容，試試條號（例如 §130）或較短的關鍵字。")]));
 }
 async function render(){
+  if(S.mode!=='vn'){document.body.classList.remove('vn-screen','vn-writing-mode','vn-keyboard')}
   ttsStop();save();header();
   document.querySelector('.wrap').classList.toggle('essay-layout',S.mode==='essay'&&!$('#q').value.trim());
+  document.querySelector('.wrap').classList.toggle('vn-layout',S.mode==='vn'&&!$('#q').value.trim());
   let d;try{d=await load(S.subject)}catch(e){$("#main").replaceChildren(el("p","empty","這一科的資料沒有載入成功，請重新整理頁面。"));return}
   const c=toc(d),q=$("#q").value.trim();
   if(q){stopEssayTimer();try{await loadEssays()}catch(e){}return viewSearch(d,q)}
+  if(S.mode==='vn'){
+    try{return viewVN(d,await loadEssays())}
+    catch(e){$('#main').replaceChildren(el('p','empty','劇情模式載入失敗：'+esc(e.message)));return}
+  }
   if(S.mode==='essay'){
     try{return viewEssay(d,await loadEssays())}
     catch(e){$("#main").replaceChildren(el('p','empty','申論連結資料載入失敗，請確認 data/essay-memory.json 已與頁面一起部署。'));return}
   }
   stopEssayTimer();({tree:()=>viewTree(d,c),cards:()=>viewCards(d),compare:()=>viewCompare(d),numbers:()=>viewNumbers(d),updates:()=>viewUpdates(d),laws:async()=>{try{await loadEssays()}catch(e){}viewLaws(d)}})[S.mode]();
 }
+$("#mode-select").onchange=e=>{S.mode=e.currentTarget.value;$("#q").value='';render()};
+$("#mobile-tools").onclick=()=>{const t=$("#top-tools");const open=t.classList.toggle('tools-open');$("#mobile-tools").setAttribute('aria-expanded',String(open))};
 $("#recite").onclick=()=>{S.recite=!S.recite;render()};
 $("#eink").onclick=()=>{S.eink=!S.eink;render()};
 let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原（不需要網路，也不連至第三方服務）。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-20e';
+const BACKUP_APP_VERSION='tb-2026-10-22d';
+const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
   'tb-v1':JSON.parse(JSON.stringify(S)),
   [DRAFT_KEY]:JSON.parse(JSON.stringify(essayDrafts)),
-  [ERROR_KEY]:JSON.parse(JSON.stringify(essayErrors))
+  [ERROR_KEY]:JSON.parse(JSON.stringify(essayErrors)),
+  [STORY_KEY]:(()=>{try{return JSON.parse(localStorage.getItem(STORY_KEY)||'null')}catch(e){return null}})()
 });
 $('#backup').onclick=()=>{
   try{
@@ -831,8 +873,24 @@ $('#backup-file').onchange=async e=>{
     for(const k of ['known','cards','essayKnown','essayRecall','ch','essayPick'])if(incoming[k]!==undefined&&!isRecord(incoming[k]))throw new Error('進度欄位格式不正確：'+k);
     const textMap=(obj,maxLength)=>Object.fromEntries(Object.entries(obj).filter(([k,v])=>/^(criminal|procedure|duty)-\d{2}$/.test(k)&&typeof v==='string').slice(0,35).map(([k,v])=>[k,v.slice(0,maxLength)]));
     const backupDrafts=textMap(data[DRAFT_KEY],5000),backupErrors=textMap(data[ERROR_KEY],1200);
+    let storyBackup=data[STORY_KEY];
+    // 22b 以前只有一章單一紀錄；保留其既有進度並轉為 35 章結構。
+    if(storyBackup==null&&isRecord(data[OLD_STORY_KEY])){
+      const previous=data[OLD_STORY_KEY];
+      if(previous.chapterId==='vn-procedure-01'&&isRecord(previous.answers))
+        storyBackup={schema:2,lastChapterId:previous.chapterId,chapters:{[previous.chapterId]:previous}};
+    }
+    if(storyBackup!=null){
+      if(!isRecord(storyBackup)||storyBackup.schema!==2||!isRecord(storyBackup.chapters)||JSON.stringify(storyBackup).length>900000)
+        throw new Error('劇情紀錄格式或容量異常');
+      if(Object.keys(storyBackup.chapters).length>35)throw new Error('劇情章節數不符');
+      for(const [id,entry] of Object.entries(storyBackup.chapters)){
+        if(!/^vn-(duty|criminal|procedure)-\d{2}$/.test(id)||!isRecord(entry)||entry.chapterId!==id||!isRecord(entry.answers))
+          throw new Error('劇情章節內容不符：'+id);
+      }
+    }
     if(!confirm('確定匯入備份？將保留本機未衝突的題目紀錄；同一題若有衝突，以備份內容為準。\n建議先匯出本機資料留底。'))return;
-    const keys=['tb-v1',DRAFT_KEY,ERROR_KEY],old=Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]));
+    const keys=['tb-v1',DRAFT_KEY,ERROR_KEY,...(storyBackup!=null?[STORY_KEY]:[])],old=Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]));
     const mergeKeys=['known','cards','essayKnown','essayRecall','ch','essayPick'];
     const nextS={...S};
     const scalarKeys=['subject','mode','recite','eink','onlyWeak','essayFilter'];
@@ -842,12 +900,12 @@ $('#backup-file').onchange=async e=>{
     if(!MODES.some(([id])=>id===nextS.mode))nextS.mode='essay';
     if(!['all','priority','review','errors'].includes(nextS.essayFilter))nextS.essayFilter='all';
     const mergedDrafts={...essayDrafts,...backupDrafts},mergedErrors={...essayErrors,...backupErrors};
-    try{localStorage.setItem('tb-v1',JSON.stringify(nextS));localStorage.setItem(DRAFT_KEY,JSON.stringify(mergedDrafts));localStorage.setItem(ERROR_KEY,JSON.stringify(mergedErrors))}
+    try{localStorage.setItem('tb-v1',JSON.stringify(nextS));localStorage.setItem(DRAFT_KEY,JSON.stringify(mergedDrafts));localStorage.setItem(ERROR_KEY,JSON.stringify(mergedErrors));if(storyBackup!=null){const currentStory=(()=>{try{return JSON.parse(localStorage.getItem(STORY_KEY)||'null')}catch(e){return null}})();const mergedStory={schema:2,chapters:{...(isRecord(currentStory?.chapters)?currentStory.chapters:{}),...storyBackup.chapters},lastChapterId:storyBackup.lastChapterId||currentStory?.lastChapterId||null};localStorage.setItem(STORY_KEY,JSON.stringify(mergedStory))}}
     catch(err){for(const k of keys){try{old[k]===null?localStorage.removeItem(k):localStorage.setItem(k,old[k])}catch(_){}}throw err}
     Object.assign(S,nextS);essayDrafts=mergedDrafts;essayErrors=mergedErrors;
     for(const k of Object.keys(essayUnsaved))delete essayUnsaved[k];
     for(const k of Object.keys(essayErrorUnsaved))delete essayErrorUnsaved[k];
-    $('#q').value='';render();alert('匯入完成：熟練紀錄、草稿及錯漏註記已合併至本裝置。');
+    $('#q').value='';if(storyBackup!=null)window.vnForgetCurrentUI?.();render();alert('匯入完成：已合併熟練、申論草稿及錯漏紀錄；若備份包含劇情進度，會保留其他章節並依題號合併。');
   }catch(err){alert('匯入失敗，原本資料盡可能保留：'+err.message)}
 };
 $('#help').onclick=()=>$('#help-dialog').showModal();

@@ -1,15 +1,24 @@
 {
- "name": "升官等記憶樹",
- "short_name": "記憶樹",
- "description": "刑法、刑事訴訟法、警察勤務三科互動記憶工具書",
- "lang": "zh-Hant",
- "start_url": "./",
- "scope": "./",
- "display": "standalone",
- "background_color": "#F3F5F8",
- "theme_color": "#16223A",
- "icons": [
-  {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
-  {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
- ]
+  "name": "升官等記憶樹",
+  "short_name": "記憶樹",
+  "description": "原有35題升官等申論記憶樹，新增手機與平板全畫面2D劇情互動章節",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3F5F8",
+  "theme_color": "#16223A",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
