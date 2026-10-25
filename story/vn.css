@@ -202,3 +202,21 @@ body.vn-screen.vn-writing-mode{background:#f1f3f8}
   .vn-review-tag{font-size:10px;top:max(51px,calc(env(safe-area-inset-top) + 42px));max-width:62vw;}
 }
 @media(max-height:550px){body.vn-screen .vn-review-tag{display:none}}
+/* 25a：解謎面板內容可內部捲動（按鈕固定在底部）、法條連結、結案自評、骨架重建 */
+.vn-panel-body{display:flex;flex-direction:column;gap:8px;min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
+.vn-refs{display:flex;flex-wrap:wrap;gap:6px}
+.vn-library-intro p{white-space:pre-line}
+.vn-review-tag{cursor:pointer;font-family:inherit;pointer-events:auto}
+.vn-end-panel h3{margin:18px 0 6px;color:#152438;text-align:left}
+.vn-selfcheck{display:grid;gap:6px;text-align:left;color:#253a4e;line-height:1.6}
+.vn-selfcheck input{margin-right:6px;accent-color:#3c6e8f}
+.vn-end-panel textarea{width:100%;box-sizing:border-box;margin:8px 0}
+dialog:has(.vn-rebuild){width:min(640px,calc(100vw - 24px));max-height:85dvh;padding:0;border-radius:14px;border:1px solid #8ba3b8;background:#112438;color:#f4f6fc}
+.vn-rebuild{padding:clamp(12px,4vw,22px);display:grid;gap:10px}.vn-rebuild .vn-muted{color:#c9d8e4}
+.vn-rebuild ol{margin:0;padding-left:22px;line-height:1.8}
+:root[data-eink] .vn-selfcheck input{accent-color:#000}
+/* 25b：總整理分類題、快問 */
+.vn-drill-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,46%);gap:8px;align-items:center;font-size:14px;line-height:1.45;color:#eef4fb;border-bottom:1px solid #ffffff22;padding:5px 0}
+.vn-drill-row .vn-topic-select{width:100%;min-width:0;font-size:13px;padding:5px}
+.vn-drill-row[data-ok=true] span{color:#9fe0c4}.vn-drill-row[data-ok=false] span{color:#ffb4a6}
+:root[data-eink] .vn-drill-row{color:#111}

@@ -305,7 +305,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-22d 劇情候選版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-25b 候選版</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -364,7 +364,7 @@ let S={subject:"criminal",mode:"essay",ch:{},recite:false,eink:false,known:{},ca
 try{Object.assign(S,JSON.parse(localStorage.getItem("tb-v1")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("tb-v1",JSON.stringify(S))}catch(e){}};
 // 申論題記憶路徑的進度獨立於原本的樹狀節點、閃卡熟練度。
-S.essayPick ||= {}; S.essayKnown ||= {}; S.essayRecall ||= {}; S.essayFilter ||= "all";
+S.essayPick ||= {}; S.essayKnown ||= {}; S.essayRecall ||= {}; S.essaySelf ||= {}; S.essayFilter ||= "all";
 const DRAFT_KEY='tb-essay-draft-v1';
 // 易錯註記獨立儲存；舊有 tb-v1、閃卡與默寫草稿鍵值保持相容。
 const ERROR_KEY='tb-essay-errors-v1';
@@ -612,7 +612,8 @@ function viewEssay(d,collection){
   if(!chosen){m.replaceChildren(heading,intro,toolbar,el('p','empty','目前沒有符合篩選條件的題目。切換「全部題目」可繼續練習。'));return}
   let revealed=0,mapVisible=false,answerVisible=false,visualCount=0;
   let draftText=String(Object.hasOwn(essayUnsaved,chosen.id)?essayUnsaved[chosen.id]:(essayDrafts[chosen.id]||''));
-  const checkedSteps=new Set();
+  const checkedSteps=new Set(S.essaySelf[chosen.id]||[]);
+  const keepChecked=()=>{S.essaySelf[chosen.id]=[...checkedSteps];save()};
   let errorText=String(Object.hasOwn(essayErrorUnsaved,chosen.id)?essayErrorUnsaved[chosen.id]:(essayErrors[chosen.id]||''));
   let durationSeconds=15*60,remainingSeconds=durationSeconds,timerRunning=false,deadline=0;
   const timerBox=el('section','essay-timer'),timerDisplay=el('strong','essay-timer-display',clockText(remainingSeconds));
@@ -690,7 +691,7 @@ function viewEssay(d,collection){
     const next=el('button','btn good',revealed>=chosen.steps.length?'已全部揭露':'揭露下一段');next.disabled=revealed>=chosen.steps.length;
     next.onclick=()=>{revealed=Math.min(chosen.steps.length,revealed+1);draw()};
     const show=el('button','btn','揭露全部');show.onclick=()=>{revealed=chosen.steps.length;draw()};
-    const reset=el('button','btn','重新默背');reset.onclick=()=>{revealed=0;mapVisible=false;answerVisible=false;visualCount=0;checkedSteps.clear();draw()};
+    const reset=el('button','btn','重新默背');reset.onclick=()=>{revealed=0;mapVisible=false;answerVisible=false;visualCount=0;checkedSteps.clear();keepChecked();draw()};
     actions.append(next,show,reset,sayBtn('唸題目',()=>ttsPlay([{text:chosen.question,el:question}])));
     if(chosen.visual){
       const visual=el('button','btn',mapVisible?'收起情境圖':'開啟圖像記憶');
@@ -700,6 +701,7 @@ function viewEssay(d,collection){
     const link=el('button','btn','前往記憶樹');link.onclick=()=>{
       S.ch[S.subject]=chosen.chapter;S.mode='tree';$('#q').value='';render();window.scrollTo({top:0,behavior:'auto'});
     };actions.append(link);
+    if(window.vnRebuild)actions.append(Object.assign(el('button','btn','骨架重建'),{onclick:()=>window.vnRebuild(chosen)}));
     const compose=el('section','essay-compose');
     const composeHead=el('div','essay-compose-head');composeHead.append(el('h3',null,'先寫出骨架（不顯示標準答案）'));
     const counter=el('span','count',`${draftText.length} 字`);composeHead.append(counter);
@@ -740,7 +742,7 @@ function viewEssay(d,collection){
       const state=el('span','essay-notice',`${checkedSteps.size} / ${chosen.steps.length} 段能獨立寫出`);
       chosen.steps.forEach((step,i)=>{
         const line=el('label','essay-checkline'),box=el('input');box.type='checkbox';box.checked=checkedSteps.has(i);
-        box.onchange=()=>{box.checked?checkedSteps.add(i):checkedSteps.delete(i);
+        box.onchange=()=>{box.checked?checkedSteps.add(i):checkedSteps.delete(i);keepChecked();
           state.textContent=`${checkedSteps.size} / ${chosen.steps.length} 段能獨立寫出`};
         line.append(box,el('span',null,esc(step)));audit.append(line);
       });
@@ -843,7 +845,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原（不需要網路，也不連至第三方服務）。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-22d';
+const BACKUP_APP_VERSION='tb-2026-10-25b';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
@@ -870,7 +872,7 @@ $('#backup-file').onchange=async e=>{
     if(parsed?.format!==BACKUP_FORMAT||parsed.schema!==1||!isRecord(data)||!isRecord(data['tb-v1'])||!isRecord(data[DRAFT_KEY])||!isRecord(data[ERROR_KEY]))
       throw new Error('格式或版本不符合記憶樹備份規格');
     const incoming=data['tb-v1'];
-    for(const k of ['known','cards','essayKnown','essayRecall','ch','essayPick'])if(incoming[k]!==undefined&&!isRecord(incoming[k]))throw new Error('進度欄位格式不正確：'+k);
+    for(const k of ['known','cards','essayKnown','essayRecall','essaySelf','ch','essayPick'])if(incoming[k]!==undefined&&!isRecord(incoming[k]))throw new Error('進度欄位格式不正確：'+k);
     const textMap=(obj,maxLength)=>Object.fromEntries(Object.entries(obj).filter(([k,v])=>/^(criminal|procedure|duty)-\d{2}$/.test(k)&&typeof v==='string').slice(0,35).map(([k,v])=>[k,v.slice(0,maxLength)]));
     const backupDrafts=textMap(data[DRAFT_KEY],5000),backupErrors=textMap(data[ERROR_KEY],1200);
     let storyBackup=data[STORY_KEY];
@@ -891,7 +893,7 @@ $('#backup-file').onchange=async e=>{
     }
     if(!confirm('確定匯入備份？將保留本機未衝突的題目紀錄；同一題若有衝突，以備份內容為準。\n建議先匯出本機資料留底。'))return;
     const keys=['tb-v1',DRAFT_KEY,ERROR_KEY,...(storyBackup!=null?[STORY_KEY]:[])],old=Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]));
-    const mergeKeys=['known','cards','essayKnown','essayRecall','ch','essayPick'];
+    const mergeKeys=['known','cards','essayKnown','essayRecall','essaySelf','ch','essayPick'];
     const nextS={...S};
     const scalarKeys=['subject','mode','recite','eink','onlyWeak','essayFilter'];
     for(const k of scalarKeys)if(Object.hasOwn(incoming,k))nextS[k]=incoming[k];
