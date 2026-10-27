@@ -1,5 +1,5 @@
 // Promotion PWA：只管理本專案 tb 版本快取，避免清除同源其他 PWA 的快取。
-const V = 'tb-2026-10-27b';
+const V = 'tb-2026-10-27c';
 const CACHE = 'promotion-' + V;
 const CACHE_PREFIX = 'promotion-tb-';
 const CORE = [
