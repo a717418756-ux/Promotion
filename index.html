@@ -168,6 +168,7 @@ mark{background:var(--sealbg);color:inherit;border-radius:2px}
 .essay-toolbar .chip{font-size:12px;padding:5px 12px}
 .essay-toolbar .chip[aria-pressed="true"]{background:var(--hi);border-color:var(--ink);color:var(--ink)}
 .essay-summary{font-size:12px;color:var(--muted);margin-left:auto}
+.essay-variant{border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:var(--panel)}.essay-variant summary{cursor:pointer;font-weight:600}.essay-variant ol{padding-left:20px}.essay-variant li{margin:6px 0}
 .essay-review{font-size:12px;color:var(--muted);border-left:3px solid var(--jade);padding:8px 11px;background:var(--panel)}
 .essay-map{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel)}
 .essay-map-title{font-weight:700;margin-bottom:8px;font-family:var(--f-display)}
@@ -305,7 +306,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-25c 候選版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-27b 候選版</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -401,7 +402,7 @@ async function load(id){
 const nodesOf=c=>{const a=[];const w=ns=>ns.forEach(n=>{a.push(n);n.c&&w(n.c)});w(c.tree||[]);return a};
 
 /* 20a：法條全文（只連結明示法名之條號）、朗讀（瀏覽器內建語音，離線可用與否視裝置語音包）、挖空回想。 */
-const LAW_ALIAS={'刑法施行法':'刑法施行法','刑事訴訟法':'刑事訴訟法','刑訴法':'刑事訴訟法','刑訴':'刑事訴訟法','刑法':'刑法','跟蹤騷擾防制法':'跟蹤騷擾防制法','跟騷法':'跟蹤騷擾防制法','詐欺犯罪危害防制條例':'詐欺犯罪危害防制條例','詐欺條例':'詐欺犯罪危害防制條例','詐防條例':'詐欺犯罪危害防制條例','貪污治罪條例':'貪污治罪條例','貪污條例':'貪污治罪條例','洗錢防制法':'洗錢防制法','洗錢法':'洗錢防制法','警察勤務條例':'警察勤務條例','勤務條例':'警察勤務條例','警察職權行使法':'警察職權行使法','警職法':'警察職權行使法','警察法施行細則':'警察法施行細則','警察法':'警察法','警察勤務區訪查辦法':'警察勤務區訪查辦法','訪查辦法':'警察勤務區訪查辦法','治安顧慮人口查訪辦法':'治安顧慮人口查訪辦法','查訪辦法':'治安顧慮人口查訪辦法','集會遊行法':'集會遊行法','集遊法':'集會遊行法','警械使用條例':'警械使用條例','社會秩序維護法':'社會秩序維護法','社維法':'社會秩序維護法','行政程序法':'行政程序法','行政罰法':'行政罰法','行政執行法':'行政執行法','道路交通管理處罰條例':'道路交通管理處罰條例','道交條例':'道路交通管理處罰條例','公務人員保障法':'公務人員保障法','刑事妥速審判法':'刑事妥速審判法','妥速審判法':'刑事妥速審判法','通訊保障及監察法':'通訊保障及監察法','通保法':'通訊保障及監察法','家庭暴力防治法':'家庭暴力防治法','家暴法':'家庭暴力防治法','兒童及少年福利與權益保障法':'兒童及少年福利與權益保障法','兒少權益保障法':'兒童及少年福利與權益保障法','兒少權法':'兒童及少年福利與權益保障法','檢察官與司法警察機關執行職務聯繫辦法':'檢察官與司法警察機關執行職務聯繫辦法','聯繫辦法':'檢察官與司法警察機關執行職務聯繫辦法'};
+const LAW_ALIAS={'刑法施行法':'刑法施行法','刑事訴訟法':'刑事訴訟法','刑訴法':'刑事訴訟法','刑訴':'刑事訴訟法','刑法':'刑法','跟蹤騷擾防制法':'跟蹤騷擾防制法','跟騷法':'跟蹤騷擾防制法','詐欺犯罪危害防制條例':'詐欺犯罪危害防制條例','詐欺條例':'詐欺犯罪危害防制條例','詐防條例':'詐欺犯罪危害防制條例','貪污治罪條例':'貪污治罪條例','貪污條例':'貪污治罪條例','洗錢防制法':'洗錢防制法','洗錢法':'洗錢防制法','警察勤務條例':'警察勤務條例','勤務條例':'警察勤務條例','警察職權行使法':'警察職權行使法','警職法':'警察職權行使法','警察法施行細則':'警察法施行細則','警察法':'警察法','警察勤務區訪查辦法':'警察勤務區訪查辦法','訪查辦法':'警察勤務區訪查辦法','治安顧慮人口查訪辦法':'治安顧慮人口查訪辦法','查訪辦法':'治安顧慮人口查訪辦法','集會遊行法':'集會遊行法','集遊法':'集會遊行法','警械使用條例':'警械使用條例','社會秩序維護法':'社會秩序維護法','社維法':'社會秩序維護法','行政程序法':'行政程序法','行政罰法':'行政罰法','行政執行法':'行政執行法','道路交通管理處罰條例':'道路交通管理處罰條例','道交條例':'道路交通管理處罰條例','公務人員保障法':'公務人員保障法','刑事妥速審判法':'刑事妥速審判法','妥速審判法':'刑事妥速審判法','通訊保障及監察法':'通訊保障及監察法','通保法':'通訊保障及監察法','家庭暴力防治法':'家庭暴力防治法','家暴法':'家庭暴力防治法','兒童及少年福利與權益保障法':'兒童及少年福利與權益保障法','兒少權益保障法':'兒童及少年福利與權益保障法','兒少權法':'兒童及少年福利與權益保障法','檢察官與司法警察機關執行職務聯繫辦法':'檢察官與司法警察機關執行職務聯繫辦法','聯繫辦法':'檢察官與司法警察機關執行職務聯繫辦法','中華民國憲法':'中華民國憲法','憲法':'中華民國憲法'};
 const LAW_KEYS=Object.keys(LAW_ALIAS).sort((a,b)=>b.length-a.length);
 const SUBJECT_LAW={criminal:'刑法',procedure:'刑事訴訟法'};
 // ref 欄（如「刑訴§230、§231」）：同一字串內未寫法名者沿用前一個法名；未收錄之法規不連結。
@@ -428,16 +429,21 @@ const parseProse=(s,def)=>{s=String(s??'');const out=[],clean=[];let last=null,p
 const linkHtml=(s,parse)=>{s=String(s??'');let h='',p=0;
   for(const t of parse(s)){h+=esc(s.slice(p,t.i))+`<button type="button" class="lawlink" data-law="${esc(t.law)}" data-a="${t.a}">${esc(s.slice(t.i,t.j))}</button>`;p=t.j}
   return h+esc(s.slice(p))};
-const linkRefs=s=>linkHtml(s,parseRefs), linkLaw=(s,def)=>linkHtml(s,t=>parseProse(t,def));
+// 大法官解釋／憲法判決：「釋字第535號」「釋字445、718」「112年憲判字第12號」「113憲判5」，統一為收錄字號。
+const CASE_LAW='大法官解釋及憲法判決',CASE_RE=/釋字第?\d+號?(?:、第?\d+號?(?![\d條項款]))*|(\d{3})年?憲判字?第?(\d+)號?/g;
+const parseCases=s=>[...String(s??'').matchAll(CASE_RE)].flatMap(m=>m[1]?[{i:m.index,j:m.index+m[0].length,law:CASE_LAW,a:`${m[1]}年憲判字第${m[2]}號`}]
+  :[...m[0].matchAll(/(?:釋字)?第?(\d+)號?/g)].map(p=>({i:m.index+p.index,j:m.index+p.index+p[0].length,law:CASE_LAW,a:`釋字第${p[1]}號`})));
+const withCases=parse=>s=>[...parse(s),...parseCases(s)].sort((x,y)=>x.i-y.i);
+const linkRefs=s=>linkHtml(s,withCases(parseRefs)), linkLaw=(s,def)=>linkHtml(s,withCases(t=>parseProse(t,def)));
 let LAWS;
 async function loadLaws(){if(LAWS)return LAWS;const r=await fetch('data/laws.json');if(!r.ok)throw new Error(r.status);return LAWS=(await r.json()).laws}
-const artName=a=>'第'+a.replace('-','條之')+(a.includes('-')?'':'條');
+const artName=a=>/^\d/.test(a)?'第'+a.replace('-','條之')+(a.includes('-')?'':'條'):a;
 let lawAt=null;
 async function openLaw(law,a){
   try{await loadLaws()}catch(e){alert('法條資料載入失敗');return}
   const L=LAWS[law],keys=L?Object.keys(L.a):[];lawAt={law,a};
   $('#law-title').textContent=`${law} ${artName(a)}`;$('#law-ver').textContent=L?`（${L.date} 版）`:'';
-  $('#law-text').textContent=L?.a[a]??'本條未收錄於目前法規資料（可能為條號引用錯誤或條文已刪除）。';
+  $('#law-text').textContent=L?.a[a]??(law===CASE_LAW?'本則未收錄（僅摘錄本App引用之解釋及判決）。':'本條未收錄於目前法規資料（可能為條號引用錯誤或條文已刪除）。');
   const k=keys.indexOf(a);$('#law-prev').disabled=k<1;$('#law-next').disabled=k<0||k>=keys.length-1;
   $('#law-prev').onclick=()=>openLaw(law,keys[k-1]);$('#law-next').onclick=()=>openLaw(law,keys[k+1]);
   $('#law-say').onclick=()=>ttsPlay([{text:`${law}${artName(a)}。${L?.a[a]||''}`,el:$('#law-text')}]);
@@ -501,14 +507,14 @@ function viewLaws(d){
     const only=el('button','chip','只看本科引用');only.setAttribute('aria-pressed',S.lawOnlyUsed!==false);
     const play=el('button','btn good','🔊 連續朗讀');
     const tools=el('div','law-tools');tools.append(sel,q,only,play);
-    const note=el('p','essay-notice','刑法、刑訴、通保法、家暴法、聯繫辦法等12法依全國法規資料庫下載檔；勤務條例、警職法等14法取自你的 Y.C. 平台法規資料庫。');
+    const note=el('p','essay-notice','刑法、刑訴、通保法、家暴法、聯繫辦法等12法依全國法規資料庫下載檔；勤務條例、警職法等14法及憲法取自你的 Y.C. 平台法規資料庫；大法官解釋及憲法判決只摘錄本App引用者之爭點（案由）與解釋文（主文）。');
     let shown=[];
     const draw=()=>{const law=pick(),A=L[law].a,set=used.get(law),term=(S.lawQ||'').trim();
       let ks=Object.keys(A);const num=term.replace(/^第|條$/g,'').replace(/條之/,'-').replace(/^§/,'');
-      if(/^\d+(-\d+)?$/.test(num))ks=ks.filter(k=>k===num||k.startsWith(num+'-'));
+      if(/^\d+(-\d+)?$/.test(num))ks=ks.filter(k=>k===num||k.startsWith(num+'-')||k.includes(`第${num}號`));
       else{if(term)ks=ks.filter(k=>A[k].includes(term));if(only.getAttribute('aria-pressed')==='true'&&set)ks=ks.filter(k=>set.has(k))}
       shown=ks.slice(0,80);
-      box.replaceChildren(el('p','count',`${ks.length} 條${ks.length>80?'（顯示前 80 條，請以條號或關鍵字縮小）':''}${set?`｜本科引用 ${set.size} 條`:'｜本科未引用此法'}`),...shown.map(k=>{
+      box.replaceChildren(el('p','count',`${ks.length} ${law===CASE_LAW?'則':'條'}${ks.length>80?'（顯示前 80 條，請以條號或關鍵字縮小）':''}${set?`｜本科引用 ${set.size} 條`:'｜本科未引用此法'}`),...shown.map(k=>{
         const it=el('div','law-item'),h=el('h3',null,`${esc(artName(k))}`),t=el('div','d'+(S.recite?' hid':''),esc(A[k]));
         t.onclick=()=>t.classList.toggle('hid');h.append(sayBtn('朗讀',()=>ttsPlay([{text:`${artName(k)}。${A[k]}`,el:it,before:()=>t.classList.remove('hid')}])));
         it.dataset.k=k;it.append(h,t);return it}))};
@@ -759,6 +765,7 @@ function viewEssay(d,collection){
         save();viewEssay(d,collection);
       };gradeBox.append(b);
     });
+    (chosen.variants||[]).forEach(v=>content.push(el('details','essay-variant',`<summary>預測變化題｜${esc(v.title)}</summary><div class="essay-question">${linkLaw(v.question)}</div><ol>${v.points.map(t=>`<li>${linkLaw(t,SUBJECT_LAW[S.subject])}</li>`).join('')}</ol><p class="essay-notice">來源：${esc(v.source)}。要點依本題校訂答案與本App法規整理，不是完整參考答案。</p>`)));
     content.push(gradeBox);
     const errorBox=el('section','essay-compose essay-errors'),errorTitle=el('h3',null,'本題錯漏註記（只存在此裝置）');
     const errorField=el('textarea');errorField.maxLength=1200;errorField.value=errorText;
@@ -845,7 +852,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原（不需要網路，也不連至第三方服務）。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-25c';
+const BACKUP_APP_VERSION='tb-2026-10-27b';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
@@ -873,7 +880,7 @@ $('#backup-file').onchange=async e=>{
       throw new Error('格式或版本不符合記憶樹備份規格');
     const incoming=data['tb-v1'];
     for(const k of ['known','cards','essayKnown','essayRecall','essaySelf','ch','essayPick'])if(incoming[k]!==undefined&&!isRecord(incoming[k]))throw new Error('進度欄位格式不正確：'+k);
-    const textMap=(obj,maxLength)=>Object.fromEntries(Object.entries(obj).filter(([k,v])=>/^(criminal|procedure|duty)-\d{2}$/.test(k)&&typeof v==='string').slice(0,35).map(([k,v])=>[k,v.slice(0,maxLength)]));
+    const textMap=(obj,maxLength)=>Object.fromEntries(Object.entries(obj).filter(([k,v])=>/^(criminal|procedure|duty)-\d{2}$/.test(k)&&typeof v==='string').slice(0,60).map(([k,v])=>[k,v.slice(0,maxLength)]));
     const backupDrafts=textMap(data[DRAFT_KEY],5000),backupErrors=textMap(data[ERROR_KEY],1200);
     let storyBackup=data[STORY_KEY];
     // 22b 以前只有一章單一紀錄；保留其既有進度並轉為 35 章結構。
