@@ -211,10 +211,21 @@ button.mcq-opt:hover,.mcq-opt[aria-pressed="true"]{border-color:var(--ink)}.mcq-
 .mcq-grid{display:flex;flex-wrap:wrap;gap:4px}.mcq-grid button{min-width:32px;padding:3px 0;border:1px solid var(--line);background:var(--panel);border-radius:5px;font:12px var(--f-ref);cursor:pointer;color:var(--ink)}
 .mcq-grid button[data-on="true"]{background:var(--hi);border-color:var(--ink)}.mcq-grid button[aria-current="true"]{outline:2px solid var(--seal)}
 .mcq-clock{font:700 15px var(--f-ref);color:var(--seal)}.mcq-score{font:700 22px var(--f-display);margin:0}
-.mcq-tablewrap{overflow-x:auto}.mcq-table{border-collapse:collapse;width:100%;font-size:13px}.mcq-table th,.mcq-table td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;white-space:nowrap}
+.mcq-tablewrap{overflow-x:auto}.mcq-table{border-collapse:collapse;width:100%;min-width:0;font-size:13px}.mcq-table th,.mcq-table td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;white-space:nowrap}
 .mcq-table td:first-child{white-space:normal}.mcq-table tr.weak td{color:var(--seal)}
 .mcq-analysis{white-space:pre-wrap;font-size:13px;line-height:1.8;margin-top:8px}
-@media(max-width:670px){.mcq-stat{grid-template-columns:repeat(2,minmax(0,1fr))}.mcq-card{padding:12px}}
+.mcq-past{border:1px dashed var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:8px;margin:6px 0}.mcq-past .mcq-q{font-size:14px}
+.mcq-note{margin:0;padding:8px 12px;border-radius:8px;background:var(--hi);font-weight:600}.mcq h3{margin:4px 0 0;font-size:15px}
+@media(max-width:670px){.mcq-table th,.mcq-table td{padding:5px 4px}.mcq-stat{grid-template-columns:repeat(2,minmax(0,1fr))}.mcq-card{padding:12px}}
+
+/* 29a 國文作文 */
+.comp-paras{display:grid;gap:8px}.comp-para{border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:12px 14px;line-height:1.95;font-size:15px}
+.comp-para.pending{border-style:dashed;color:var(--muted);font-size:13px}.comp-lab{font-weight:700;color:var(--jade);margin-right:4px}
+.comp-para b{background:var(--amberbg);color:var(--amber);font-weight:600;border-radius:3px;padding:0 2px}
+.comp-prompt blockquote,.comp-doc blockquote{margin:0;border-left:3px solid var(--line);padding:6px 12px;background:var(--panel);color:var(--ink)}
+.comp-card{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:18px;line-height:1.9;font-size:16px;display:grid;gap:8px}.comp-big{font-size:24px;letter-spacing:.1em}
+.comp-apply{font-size:15px;padding:12px 14px}.comp-doc{line-height:1.85;overflow-wrap:anywhere}.comp-doc h2{font:900 20px var(--f-display)}.comp-doc h3{font-size:17px;margin-top:20px}.comp-doc h4{font-size:15px}
+.comp-doc a{color:var(--jade)}.comp-table td{white-space:normal}
 
 [hidden]{display:none!important}
 body{margin:0}
@@ -326,7 +337,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-28d 正式版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-29a 正式版</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -358,7 +369,8 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
   <p><strong>法條全文：</strong>綠色虛底線的條號可點開全文（只連結寫明法名者，例如「刑法第302條」「刑訴§230」）；「法條」分頁可依條號或關鍵字查詢、背誦模式遮住條文、連續朗讀。</p>
   <p><strong>朗讀：</strong>使用裝置內建語音（需中文語音包；離線可用與否依裝置）。底部控制列可暫停、上下段、調語速與「題答間停頓」，停頓時間就是自我回想時間。</p>
   <p><strong>挖空回想：</strong>申論答案可遮住條號、判決字號與時限數字，先想再點，點開即計入已揭示。</p>
-  <p><strong>選擇猜題：</strong>警察法規、行政法、憲法與法學緒論共250題（使用者提供之回測模擬題庫）。答對的題目依1、3、7、16、35天排入「到期複習」；答錯者同輪約5題後再考一次，並列入錯題本；猜對可按「我是猜對的」改為明天再考。模擬考交卷後才對答案；「命題分析與弱點」依法規列出答對率。預測僅為統計推估，不代表真實命題。</p>
+  <p><strong>選擇猜題：</strong>警察法規、行政法、憲法與法學緒論共250題原題＋250題變化題（使用者提供之回測模擬題庫第四版）。原題答錯：看詳解後下一題立即出變化題補強；補強答對標「已補強」，再錯標「弱點」並請你做歷屆真題。原題答對：變化題排在第3天，屆時答錯視同猜對。答對依1、3、7、14天複習；原題與變化題都連對2次為「已掌握」，間隔加倍。「命題分析與弱點」列出弱點考點前20名與各法規答對率。預測僅為統計推估，不代表真實命題。</p>
+  <p><strong>國文作文：</strong>3篇範文（科技與人心、帶人之道、萬用格式）可逐段回想、挖空名言成語、朗讀與默寫；名言9句、成語17個做成閃卡；歷屆題套用表可練「根本／精進／結論」；完整講義原文照錄。範文不改寫，經驗段請換成自己的真實經驗。</p>
   <form method="dialog"><button class="btn">關閉</button></form>
 </dialog>
 <dialog class="data-help" id="ver-dialog" aria-labelledby="ver-title">
@@ -386,14 +398,14 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <script src="story/vn.js"></script>
 <script>
 const SUBJECTS=[["criminal","刑法"],["procedure","刑訴"],["duty","勤務"]];
-const MODES=[["vn","劇情遊戲"],["essay","申論訓練"],["mcq","選擇猜題"],["tree","樹狀"],["cards","閃卡"],["laws","法條"],["compare","對照"],["numbers","數字"],["updates","新法"]];
+const MODES=[["vn","劇情遊戲"],["essay","申論訓練"],["mcq","選擇猜題"],["comp","國文作文"],["tree","樹狀"],["cards","閃卡"],["laws","法條"],["compare","對照"],["numbers","數字"],["updates","新法"]];
 const $=s=>document.querySelector(s), el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let S={subject:"criminal",mode:"essay",ch:{},recite:false,eink:false,known:{},cards:{},onlyWeak:false};
 try{Object.assign(S,JSON.parse(localStorage.getItem("tb-v1")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("tb-v1",JSON.stringify(S))}catch(e){}};
 // 申論題記憶路徑的進度獨立於原本的樹狀節點、閃卡熟練度。
-S.mcq ||= {}; S.essayPick ||= {}; S.essayKnown ||= {}; S.essayRecall ||= {}; S.essaySelf ||= {}; S.essayFilter ||= "all";
+S.mcq ||= {}; S.comp ||= {}; S.compDraft ||= {}; S.essayPick ||= {}; S.essayKnown ||= {}; S.essayRecall ||= {}; S.essaySelf ||= {}; S.essayFilter ||= "all";
 const DRAFT_KEY='tb-essay-draft-v1';
 // 易錯註記獨立儲存；舊有 tb-v1、閃卡與默寫草稿鍵值保持相容。
 const ERROR_KEY='tb-essay-errors-v1';
@@ -431,7 +443,7 @@ const nodesOf=c=>{const a=[];const w=ns=>ns.forEach(n=>{a.push(n);n.c&&w(n.c)});
 
 /* 20a：法條全文（只連結明示法名之條號）、朗讀（瀏覽器內建語音，離線可用與否視裝置語音包）、挖空回想。 */
 const LAW_ALIAS={'刑法施行法':'刑法施行法','刑事訴訟法':'刑事訴訟法','刑訴法':'刑事訴訟法','刑訴':'刑事訴訟法','刑法':'刑法','跟蹤騷擾防制法':'跟蹤騷擾防制法','跟騷法':'跟蹤騷擾防制法','詐欺犯罪危害防制條例':'詐欺犯罪危害防制條例','詐欺條例':'詐欺犯罪危害防制條例','詐防條例':'詐欺犯罪危害防制條例','貪污治罪條例':'貪污治罪條例','貪污條例':'貪污治罪條例','洗錢防制法':'洗錢防制法','洗錢法':'洗錢防制法','警察勤務條例':'警察勤務條例','勤務條例':'警察勤務條例','警察職權行使法':'警察職權行使法','警職法':'警察職權行使法','警察法施行細則':'警察法施行細則','警察法':'警察法','警察勤務區訪查辦法':'警察勤務區訪查辦法','訪查辦法':'警察勤務區訪查辦法','治安顧慮人口查訪辦法':'治安顧慮人口查訪辦法','查訪辦法':'治安顧慮人口查訪辦法','集會遊行法':'集會遊行法','集遊法':'集會遊行法','警械使用條例':'警械使用條例','社會秩序維護法':'社會秩序維護法','社維法':'社會秩序維護法','行政程序法':'行政程序法','行政罰法':'行政罰法','行政執行法':'行政執行法','道路交通管理處罰條例':'道路交通管理處罰條例','道交條例':'道路交通管理處罰條例','公務人員保障法':'公務人員保障法','刑事妥速審判法':'刑事妥速審判法','妥速審判法':'刑事妥速審判法','通訊保障及監察法':'通訊保障及監察法','通保法':'通訊保障及監察法','家庭暴力防治法':'家庭暴力防治法','家暴法':'家庭暴力防治法','兒童及少年福利與權益保障法':'兒童及少年福利與權益保障法','兒少權益保障法':'兒童及少年福利與權益保障法','兒少權法':'兒童及少年福利與權益保障法','檢察官與司法警察機關執行職務聯繫辦法':'檢察官與司法警察機關執行職務聯繫辦法','聯繫辦法':'檢察官與司法警察機關執行職務聯繫辦法','中華民國憲法':'中華民國憲法','憲法':'中華民國憲法',
-  /* 28d 選擇題猜題所需 */'訴願法':'訴願法','行政訴訟法':'行政訴訟法','國家賠償法':'國家賠償法','國賠法':'國家賠償法','地方制度法':'地方制度法','地制法':'地方制度法','憲法訴訟法':'憲法訴訟法','憲訴法':'憲法訴訟法','中華民國憲法增修條文':'中華民國憲法增修條文','憲法增修條文':'中華民國憲法增修條文','增修條文':'中華民國憲法增修條文','公務人員考績法':'公務人員考績法','考績法':'公務人員考績法','公務員懲戒法':'公務員懲戒法','懲戒法':'公務員懲戒法','公務員服務法':'公務員服務法','服務法':'公務員服務法','公民投票法':'公民投票法','公投法':'公民投票法','中央行政機關組織基準法':'中央行政機關組織基準法','組織基準法':'中央行政機關組織基準法','政府資訊公開法':'政府資訊公開法','政資法':'政府資訊公開法','提審法':'提審法','槍砲彈藥刀械管制條例':'槍砲彈藥刀械管制條例','槍砲條例':'槍砲彈藥刀械管制條例','警察人員人事條例':'警察人員人事條例','人事條例':'警察人員人事條例','警察教育條例':'警察教育條例','行政執行法施行細則':'行政執行法施行細則','保障法':'公務人員保障法','偶發性及緊急性集會遊行處理原則':'偶發性及緊急性集會遊行處理原則','原住民漁民自製獵槍魚槍許可及管理辦法':'原住民漁民自製獵槍魚槍許可及管理辦法','各級警察機關學校武器彈藥統籌調配辦法':'各級警察機關學校武器彈藥統籌調配辦法','槍砲彈藥及刀械收購價格標準':'槍砲彈藥及刀械收購價格標準','槍砲彈藥審認爭議諮詢小組組織及運作辦法':'槍砲彈藥審認爭議諮詢小組組織及運作辦法','模擬槍外銷研發許可及管理辦法':'模擬槍外銷研發許可及管理辦法','檢舉違反槍砲彈藥刀械管制條例案件給獎辦法':'檢舉違反槍砲彈藥刀械管制條例案件給獎辦法','沒入物品處分規則':'沒入物品處分規則','警察人員使用槍械規範':'警察人員使用槍械規範','警察常年訓練辦法':'警察常年訓練辦法','警察遴選第三人蒐集資料辦法':'警察遴選第三人蒐集資料辦法','警械使用事件補償辦法':'警械使用事件補償辦法','警械使用調查小組組織及運作辦法':'警械使用調查小組組織及運作辦法','違反社會秩序維護法案件處理辦法':'違反社會秩序維護法案件處理辦法'};
+  /* 28d 選擇題猜題所需 */'訴願法':'訴願法','行政訴訟法':'行政訴訟法','國家賠償法':'國家賠償法','國賠法':'國家賠償法','地方制度法':'地方制度法','地制法':'地方制度法','憲法訴訟法':'憲法訴訟法','憲訴法':'憲法訴訟法','中華民國憲法增修條文':'中華民國憲法增修條文','憲法增修條文':'中華民國憲法增修條文','增修條文':'中華民國憲法增修條文','公務人員考績法':'公務人員考績法','考績法':'公務人員考績法','公務員懲戒法':'公務員懲戒法','懲戒法':'公務員懲戒法','公務員服務法':'公務員服務法','服務法':'公務員服務法','公民投票法':'公民投票法','公投法':'公民投票法','中央行政機關組織基準法':'中央行政機關組織基準法','組織基準法':'中央行政機關組織基準法','政府資訊公開法':'政府資訊公開法','政資法':'政府資訊公開法','提審法':'提審法','槍砲彈藥刀械管制條例':'槍砲彈藥刀械管制條例','槍砲條例':'槍砲彈藥刀械管制條例','警察人員人事條例':'警察人員人事條例','人事條例':'警察人員人事條例','警察教育條例':'警察教育條例','行政執行法施行細則':'行政執行法施行細則','保障法':'公務人員保障法','偶發性及緊急性集會遊行處理原則':'偶發性及緊急性集會遊行處理原則','原住民漁民自製獵槍魚槍許可及管理辦法':'原住民漁民自製獵槍魚槍許可及管理辦法','各級警察機關學校武器彈藥統籌調配辦法':'各級警察機關學校武器彈藥統籌調配辦法','槍砲彈藥及刀械收購價格標準':'槍砲彈藥及刀械收購價格標準','槍砲彈藥審認爭議諮詢小組組織及運作辦法':'槍砲彈藥審認爭議諮詢小組組織及運作辦法','模擬槍外銷研發許可及管理辦法':'模擬槍外銷研發許可及管理辦法','檢舉違反槍砲彈藥刀械管制條例案件給獎辦法':'檢舉違反槍砲彈藥刀械管制條例案件給獎辦法','沒入物品處分規則':'沒入物品處分規則','警察人員使用槍械規範':'警察人員使用槍械規範','警察常年訓練辦法':'警察常年訓練辦法','警察遴選第三人蒐集資料辦法':'警察遴選第三人蒐集資料辦法','警械使用事件補償辦法':'警械使用事件補償辦法','警械使用調查小組組織及運作辦法':'警械使用調查小組組織及運作辦法','違反社會秩序維護法案件處理辦法':'違反社會秩序維護法案件處理辦法','拘留所設置管理辦法':'拘留所設置管理辦法'};
 const LAW_KEYS=Object.keys(LAW_ALIAS).sort((a,b)=>b.length-a.length);
 const SUBJECT_LAW={criminal:'刑法',procedure:'刑事訴訟法'};
 // ref 欄（如「刑訴§230、§231」）：同一字串內未寫法名者沿用前一個法名；未收錄之法規不連結。
@@ -566,6 +578,7 @@ function header(){
   const mobileMode=$("#mode-select");
   mobileMode.replaceChildren(...MODES.map(([id,n])=>{const o=document.createElement("option");o.value=id;o.textContent=n;return o}));mobileMode.value=S.mode;
   const mq=S.mode==='mcq'&&MCQ&&!$("#q").value.trim();  // 猜題模式：科目列改為選擇題三科
+  $("#subj").hidden=S.mode==='comp';
   $("#subj").replaceChildren(...(mq?MCQ.subjects:SUBJECTS).map(([id,n])=>{const b=el("button",null,mq?n.replace('與法學緒論','法緒'):n);b.setAttribute("aria-pressed",mq?mcqSubj()===id:S.subject===id);b.onclick=()=>{mq?(S.mcqSubj=id,S.mcqLaw='',MX=null):S.subject=id;render()};return b}));
   $("#modes").replaceChildren(...MODES.map(([id,n])=>{const b=el("button",null,n);b.setAttribute("aria-pressed",S.mode===id&&!$("#q").value);b.onclick=()=>{S.mode=id;$("#q").value="";render()};return b}));
   $("#recite").setAttribute("aria-pressed",S.recite);$("#eink").setAttribute("aria-pressed",S.eink);
@@ -866,88 +879,125 @@ function viewSearch(d,q){
   if(dl&&/^\d+(-\d+)?$/.test(aq)){const b=el('button','hit',`<div class="path">法條全文</div><span class="t">${esc(dl)} ${esc(artName(aq))}</span>`);b.style.textAlign='left';b.style.cursor='pointer';b.onclick=()=>openLaw(dl,aq);hits.unshift(b)}
   m.replaceChildren(el("h2","ch",`搜尋「${esc(q)}」`),el("p","lead",`${hits.length} 筆，範圍：${esc(d.name)}`),...(hits.length?hits:[el("p","empty","沒有符合的內容，試試條號（例如 §130）或較短的關鍵字。")]));
 }
-/* 28d 選擇題猜題：練習（間隔複習＋錯題當輪重考）、模擬考（計時、交卷才對答案）、命題分析與弱點統計。進度存 S.mcq：{題號:{b:盒,due:到期,n:作答,w:錯,g:猜}}。 */
+/* 28e 選擇題猜題：原題＋變化題（題號加 v，同一題組 grp），錯題雙軌補強、模擬考、考點與法規掌握度。
+   進度存 S.mcq：{題號:{b:盒,due:到期,n:作答,w:答錯,s:連對,last:最近一次對錯,r:已補強,wk:弱點}}。 */
 let MCQ,MQ=null,MX=null,mcqTimer=null;
 async function loadMCQ(){if(MCQ)return MCQ;const r=await fetch('data/mcq.json');if(!r.ok)throw new Error(r.status);return MCQ=await r.json()}
-const MCQ_DAYS=[0,1,3,7,16,35],DAY=86400000;
+const MCQ_DAYS=[0,1,3,7,14,30],DAY=86400000;
 const mcqSubj=()=>MCQ.subjects.some(([s])=>s===S.mcqSubj)?S.mcqSubj:MCQ.subjects[0][0];
 const mcqItems=()=>MCQ.items.filter(x=>x.s===mcqSubj());
+const mcqById=id=>MCQ.items.find(y=>y.id===id);
 const stopMcqTimer=()=>{clearInterval(mcqTimer);mcqTimer=null};
-// 答題紀錄：答對升一盒、答錯回第 0 盒並立即到期；「猜對的」視同答錯但隔天再考。
-function mcqMark(x,ok,guess){const s=S.mcq[x.id]||{b:0,n:0,w:0};s.n++;if(!ok)s.w++;
-  s.b=ok&&!guess?Math.min(s.b+1,MCQ_DAYS.length-1):0;s.g=guess?1:0;s.due=Date.now()+(ok?(guess?DAY:MCQ_DAYS[s.b]*DAY):0);s.last=ok&&!guess?1:0;S.mcq[x.id]=s;save()}
-// 法源條號：法名縮寫走 LAW_ALIAS；「辦法§3」「細則§5」等泛稱指本題法源中同類者；未寫法名者沿用前一筆（前一筆為未收錄法規則不連結），否則用本題第一筆法源。
+const mst=id=>S.mcq[id]||(S.mcq[id]={b:0,n:0,w:0,s:0});
+const mastered=g=>S.mcq[g]?.s>=2&&S.mcq[g+'v']?.s>=2;  // 原題與變化題都連對2次以上
+const sched=(id,b,days)=>{const s=mst(id);s.b=b;s.due=Date.now()+days*DAY};
+const promote=(x,s)=>{const b=Math.min(s.b+1,MCQ_DAYS.length-1);sched(x.id,b,MCQ_DAYS[b]*(mastered(x.grp)?2:1))};
+/* 作答規則（使用者提供之「錯題雙軌補強」）：
+   原題錯→明天複習，下一題即出變化題（reinforce）；補強對→原題「已補強」，原題與變化題自1天起複習；補強錯→「弱點」，兩題明天再考並顯示歷屆真題。
+   原題對→升盒；變化題未排程者排在第3天。變化題於一般複習答錯→視同原題猜對，兩題回到明天。回傳下一步：'reinforce'、'weak' 或 null。 */
+function mcqMark(x,ok,ctx){const s=mst(x.id),o=mst(x.grp),v=mst(x.grp+'v');let next=null;
+  s.n++;s.last=ok?1:0;if(ok)s.s=(s.s||0)+1;else{s.s=0;s.w++}  // 28d 舊紀錄無 s 欄
+  if(!x.v){if(ok){promote(x,s);if(!v.n&&!v.due)sched(x.grp+'v',0,3)}else{sched(x.id,0,1);if(ctx!=='exam')next='reinforce'}}
+  else if(ctx==='reinforce'){if(ok){o.r=1;sched(x.grp,1,1);sched(x.id,1,1)}else{o.wk=1;sched(x.grp,0,1);sched(x.id,0,1);next='weak'}}
+  else if(ok)promote(x,s);else{o.s=0;sched(x.grp,0,1);sched(x.id,0,1)}
+  save();return next}
+const mcqTag=x=>{const o=S.mcq[x.grp]||{};return mastered(x.grp)?'已掌握':o.wk?'弱點':o.r?'已補強':''};
+// 法源條號：法名縮寫走 LAW_ALIAS；「辦法§3」「細則§5」等泛稱指本題法源中同類者；未寫法名者：前一筆為未收錄法規則不連結，否則優先取本題法源中確有此條號者，再依前一筆、本題第一筆法源。
 const MCQ_GEN=/^(?:依|另|本|同|該)?(處理辦法|辦法|細則|規則|標準|規範|原則|條例)$/;
-const mcqParse=x=>s=>{const out=[],laws=[...new Set(x.refs.filter(r=>r[1]).map(r=>r[0]))];let last;  // undefined＝本段尚未出現法名
+const mcqParse=x=>s=>{const out=[],laws=[...new Set(x.refs.filter(r=>r[1]&&r[0]!==CASE_LAW).map(r=>r[0]))],has=(l,a)=>x.refs.some(r=>r[0]===l&&r[1]===a);let last;  // undefined＝本段尚未出現法名；null＝前一筆為未收錄法規
   for(const m of String(s??'').matchAll(/([^\s§、；;，,／/～~（）()。：:「」]*)§(\d+)(?:-(\d+))?/g)){
     const key=m[1]?LAW_KEYS.find(k=>m[1].endsWith(k)):null,g=!key&&m[1].match(MCQ_GEN);
-    const law=key?LAW_ALIAS[key]:g?laws.find(l=>l.endsWith(g[1]))||null:/(法|條例|條文)$/.test(m[1])?null:last===undefined?laws[0]??null:last;last=law;
-    if(law)out.push({i:m.index+(key?m[1].length-key.length:m[1].length),j:m.index+m[0].length,law,a:m[2]+(m[3]?'-'+m[3]:'')})}
+    const a=m[2]+(m[3]?'-'+m[3]:''),law=key?LAW_ALIAS[key]:g?laws.find(l=>l.endsWith(g[1]))||null:/(法|條例|條文)$/.test(m[1])||last===null?null
+      :last&&has(last,a)?last:laws.find(l=>has(l,a))??last??laws[0]??null;last=law;  // 未寫法名：優先取本題法源中確有此條者
+    if(law)out.push({i:m.index+(key?m[1].length-key.length:m[1].length),j:m.index+m[0].length,law,a})}
   return out};
 const mcqLink=(x,s)=>linkHtml(s,withCases(mcqParse(x)));
 const lawShort=law=>LAW_KEYS.filter(n=>LAW_ALIAS[n]===law).sort((p,q)=>p.length-q.length)[0]||law,refLabel=([law,a])=>law===CASE_LAW?a:lawShort(law)+(a?'§'+a:'（全文）');
-// 弱點：依法源法規統計正確率（作答過者）。
-function mcqWeak(items){const m=new Map();
-  items.forEach(x=>{const s=S.mcq[x.id];new Set(x.refs.map(r=>r[0])).forEach(law=>{const t=m.get(law)||{law,q:0,n:0,ok:0};t.q++;if(s){t.n++;t.ok+=s.last?1:0}m.set(law,t)})});
+// 掌握度：答題數與答對數（原題＋變化題累計），依法規或考點（題組）彙整。
+function mcqStat(items,keys){const m=new Map();
+  items.forEach(x=>{const s=S.mcq[x.id];keys(x).forEach(k=>{const t=m.get(k)||{k,q:0,n:0,ok:0};t.q++;if(s?.n){t.n+=s.n;t.ok+=s.n-s.w}m.set(k,t)})});
   return [...m.values()]}
-function mcqQueue(){const items=mcqItems(),now=Date.now(),st=x=>S.mcq[x.id],f=S.mcqFilter||'due',term=$('#q').value.trim();
-  let a=items.filter(x=>({due:st(x)&&st(x).due<=now,new:!st(x),wrong:st(x)&&st(x).w>0&&st(x).b<3,all:true})[f]);
+// 同題組兩題不相鄰（即時補強除外，補強是作答時另行插入）。
+const spread=a=>{for(let i=1;i<a.length;i++)if(a[i].grp===a[i-1].grp){const j=a.findIndex((y,k)=>k>i&&y.grp!==a[i-1].grp);if(j>0)[a[i],a[j]]=[a[j],a[i]]}return a};
+const MCQ_F={due:(x,s)=>s?.due<=Date.now(),new:(x,s)=>!x.v&&!s?.n,wrong:(x,s)=>s?.w>0&&s.b<3,weak:x=>!x.v&&S.mcq[x.grp]?.wk&&!mastered(x.grp),all:x=>!x.v,var:x=>x.v};
+function mcqQueue(){const f=MCQ_F[S.mcqFilter]?S.mcqFilter:'due',term=$('#q').value.trim();
+  let a=mcqItems().filter(x=>MCQ_F[f](x,S.mcq[x.id]));
   if(S.mcqLaw)a=a.filter(x=>x.refs.some(r=>r[0]===S.mcqLaw));
   if(term)a=a.filter(x=>[x.topic,x.q,...x.o,x.ex,x.src].some(t=>t.includes(term)));
-  if(f==='due')a.sort((p,q)=>st(p).due-st(q).due);else if(S.mcqShuffle)a.sort(()=>Math.random()-.5);
-  return {key:[mcqSubj(),f,S.mcqLaw,term,S.mcqShuffle].join('|'),ids:a.map(x=>x.id),i:0,pick:{},ok:0,done:0}}
+  if(f==='due')a.sort((p,q)=>S.mcq[p.id].due-S.mcq[q.id].due);else if(S.mcqShuffle)a.sort(()=>Math.random()-.5);
+  return {key:[mcqSubj(),f,S.mcqLaw,term,S.mcqShuffle].join('|'),ids:spread(a).map(x=>x.id),i:0,pick:{},ctx:{},res:{},ok:0,done:0}}
 function viewMCQ(){
   const m=$('#main');m.className='mcq';stopMcqTimer();
-  const items=mcqItems(),now=Date.now(),st=x=>S.mcq[x.id];
-  const tried=items.filter(st),right=tried.filter(x=>st(x).last).length,due=items.filter(x=>st(x)&&st(x).due<=now).length;
-  const head=[el('h2','ch','選擇題猜題'),el('p','lead',`${esc(MCQ.title)}｜${esc(MCQ.subjects.find(([s])=>s===mcqSubj())[1])} ${items.length} 題`)];
-  const stat=el('div','mcq-stat',[['已作答',`${tried.length}/${items.length}`],['最近一次答對',tried.length?Math.round(right/tried.length*100)+'%':'—'],['到期複習',due],['熟練（第3盒以上）',items.filter(x=>st(x)?.b>=3).length]].map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join(''));
+  const items=mcqItems(),orig=items.filter(x=>!x.v),now=Date.now(),st=x=>S.mcq[x.id];
+  const n=items.reduce((t,x)=>t+(st(x)?.n||0),0),w=items.reduce((t,x)=>t+(st(x)?.w||0),0);
+  const head=[el('h2','ch','選擇題猜題'),el('p','lead',`${esc(MCQ.title)}｜${esc(MCQ.subjects.find(([s])=>s===mcqSubj())[1])} 原題 ${orig.length}＋變化題 ${items.length-orig.length}`)];
+  const stat=el('div','mcq-stat',[['原題已作答',`${orig.filter(x=>st(x)?.n).length}/${orig.length}`],['累計答對率',n?Math.round((n-w)/n*100)+'%':'—'],['到期複習',items.filter(x=>st(x)?.due<=now).length],
+    ['已掌握／弱點考點',`${orig.filter(x=>mastered(x.grp)).length}／${orig.filter(x=>MCQ_F.weak(x)).length}`]].map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join(''));
   const tabs=el('div','essay-toolbar');[['practice','練習'],['exam','模擬考'],['analysis','命題分析與弱點']].forEach(([id,n])=>{const b=el('button','chip',n);b.setAttribute('aria-pressed',(S.mcqTab||'practice')===id);b.onclick=()=>{S.mcqTab=id;save();viewMCQ()};tabs.append(b)});
   m.replaceChildren(...head,stat,tabs);
   ({practice:mcqPractice,exam:mcqExam,analysis:mcqAnalysis})[S.mcqTab||'practice'](m,items)}
 function mcqRefs(x){const box=el('div','mcq-refs');x.refs.forEach(r=>{const b=el('button','chip',esc(refLabel(r)));b.onclick=async()=>{if(r[1])return openLaw(r[0],r[1]);const L=await loadLaws();const k=Object.keys(L[r[0]]?.a||{})[0];if(k)openLaw(r[0],k)};box.append(b)});
   if(x.miss.length)box.append(el('span','essay-notice','本App未收：'+esc(x.miss.join('、'))));return box}
-// 一題：作答前隱藏考點；作答後顯示對錯、詳解（條號可點）、法源、命題依據。
-function mcqCard(x,pick,onPick,reveal){const box=el('section','mcq-card');
-  box.append(el('div','mcq-no',`${esc(MCQ.subjects.find(([s])=>s===x.s)[1])}-${String(x.n).padStart(3,'0')}${reveal?`｜考點：${esc(x.topic)}`:''}`),el('p','mcq-q',reveal?mcqLink(x,x.q):esc(x.q)));
+// 歷屆真題（Y.C. 題庫原題）：單選可作答；複選僅顯示答案。
+function pastCard(k){const p=MCQ.past[k],box=el('div','mcq-past');if(!p)return box;
+  const ol=el('div','mcq-opts'),res=el('p','mcq-verdict'),multi=p.a.length>1;
+  box.append(el('div','mcq-no',esc(`${p.t}｜${p.s}${multi?'｜複選':''}`)),el('p','mcq-q',esc(p.q)),ol,res);
+  Object.entries(p.o).forEach(([k2,t])=>{const b=el('button','mcq-opt',`<b>${k2}</b><span>${esc(t)}</span>`);b.dataset.k=k2;ol.append(b);
+    b.onclick=()=>{ol.querySelectorAll('button').forEach(o=>{o.disabled=true;o.dataset.r=p.a.includes(o.dataset.k)?'right':o===b?'wrong':''});
+      res.className='mcq-verdict '+(k2===p.a?'ok':'ng');res.textContent=k2===p.a?'✓ 答對':`✗ 正解 ${p.a}`}});
+  if(multi){ol.querySelectorAll('button').forEach(o=>{o.disabled=true});const s=el('button','btn','顯示答案');s.onclick=()=>{ol.querySelectorAll('button').forEach(o=>{if(p.a.includes(o.dataset.k))o.dataset.r='right'});s.remove();res.textContent='答案：'+p.a};box.append(s)}
+  return box}
+function mcqHist(x,open){const h=(x.v?mcqById(x.grp):x)?.hist;if(!h?.list.length)return null;
+  const d=el('details','essay-variant',`<summary>歷屆對照｜${esc(h.deg)}</summary>`);d.open=open;
+  h.list.forEach(({k,deg})=>d.append(el('p','essay-notice','對應程度：'+esc(deg)),pastCard(k)));return d}
+// 一題：作答前隱藏考點；作答後顯示對錯、詳解（條號可點）、法源、命題依據、歷屆對照。
+function mcqCard(x,pick,onPick,reveal,histOpen=false){const box=el('section','mcq-card'),tag=reveal&&mcqTag(x);
+  box.append(el('div','mcq-no',`${esc(MCQ.subjects.find(([s])=>s===x.s)[1])}-${String(x.n).padStart(3,'0')}${x.v?'｜變化題':'｜原題'}${reveal?`｜考點：${esc(x.topic)}`:''}${tag?`<span class="essay-badge">${tag}</span>`:''}`),el('p','mcq-q',reveal?mcqLink(x,x.q):esc(x.q)));
   const ol=el('div','mcq-opts');x.o.forEach((t,i)=>{const b=el(reveal?'div':'button','mcq-opt',`<b>${'ABCD'[i]}</b><span>${reveal?mcqLink(x,t):esc(t)}</span>`);
     if(reveal){b.dataset.r=i===x.a?'right':i===pick?'wrong':''}else if(pick===i)b.setAttribute('aria-pressed','true');
     if(!reveal)b.onclick=()=>onPick(i);ol.append(b)});box.append(ol);  // 揭曉後改為 div：選項內的條號按鈕不可巢狀於 button
   if(reveal){box.append(el('p','mcq-verdict '+(pick===x.a?'ok':'ng'),pick===x.a?'✓ 答對':pick==null?`未作答｜正解 ${'ABCD'[x.a]}`:`✗ 你選 ${'ABCD'[pick]}｜正解 ${'ABCD'[x.a]}`),
-    el('div','mcq-ex',mcqLink(x,x.ex)),mcqRefs(x),el('p','essay-source-note','命題依據：'+esc(x.why)))}
+    el('div','mcq-ex',mcqLink(x,x.ex)),mcqRefs(x),el('p','essay-source-note','命題依據：'+esc(x.why)));const h=mcqHist(x,histOpen);if(h)box.append(h)}
   return box}
+const MCQ_NOTE={reinforce:'下一題是本題的變化題（即時補強）：換個問法再確認一次。',weak:'✗ 補強未過：本考點標記「弱點」，原題與變化題明天再考。請先做下方「歷屆對照」的真題（第三次練習）。',ok:'✓ 補強成功：原題標記「已補強」，原題與變化題自明天起依 1、3、7、14 天複習。'};
 function mcqPractice(m,items){
-  const q=mcqQueue();if(!MQ||MQ.key!==q.key)MQ=q;
-  const bar=el('div','essay-toolbar');const cnt={due:items.filter(x=>S.mcq[x.id]?.due<=Date.now()).length,new:items.filter(x=>!S.mcq[x.id]).length,wrong:items.filter(x=>S.mcq[x.id]?.w>0&&S.mcq[x.id].b<3).length,all:items.length};
-  [['due','到期複習'],['new','未作答'],['wrong','錯題本'],['all','全部']].forEach(([id,n])=>{const b=el('button','chip',`${n} ${cnt[id]}`);b.setAttribute('aria-pressed',(S.mcqFilter||'due')===id);b.onclick=()=>{S.mcqFilter=id;save();viewMCQ()};bar.append(b)});
+  const q=mcqQueue();if(!MQ||(!MQ.custom&&MQ.key!==q.key))MQ=q;
+  const bar=el('div','essay-toolbar');
+  [['due','到期複習'],['new','未作答'],['wrong','錯題本'],['weak','弱點'],['all','全部原題'],['var','變化題']].forEach(([id,n])=>{const b=el('button','chip',`${n} ${items.filter(x=>MCQ_F[id](x,S.mcq[x.id])).length}`);
+    b.setAttribute('aria-pressed',!MQ.custom&&(MCQ_F[S.mcqFilter]?S.mcqFilter:'due')===id);b.onclick=()=>{S.mcqFilter=id;MQ=null;save();viewMCQ()};bar.append(b)});
   const sh=el('button','chip','隨機順序');sh.setAttribute('aria-pressed',!!S.mcqShuffle);sh.onclick=()=>{S.mcqShuffle=!S.mcqShuffle;MQ=null;save();viewMCQ()};bar.append(sh);
-  if(S.mcqLaw){const b=el('button','chip',`只看：${esc(lawShort(S.mcqLaw))} ✕`);b.setAttribute('aria-pressed','true');b.onclick=()=>{S.mcqLaw='';save();viewMCQ()};bar.append(b)}
+  if(S.mcqLaw){const b=el('button','chip',`只看：${esc(lawShort(S.mcqLaw))} ✕`);b.setAttribute('aria-pressed','true');b.onclick=()=>{S.mcqLaw='';MQ=null;save();viewMCQ()};bar.append(b)}
+  if(MQ.custom){const b=el('button','chip',`${esc(MQ.custom)} ✕`);b.setAttribute('aria-pressed','true');b.onclick=()=>{MQ=null;viewMCQ()};bar.append(b)}
   m.append(bar);
-  const id=MQ.ids[MQ.i],x=id&&MCQ.items.find(y=>y.id===id);
-  if(!x){m.append(el('p','empty',MQ.done?`本輪完成：${MQ.done} 題，答對 ${MQ.ok} 題。`:(S.mcqFilter||'due')==='due'?'目前沒有到期的題目。先做「未作答」，答過的題目會依熟練度排入複習。':'沒有符合條件的題目。'),
+  const id=MQ.ids[MQ.i],x=id&&mcqById(id);
+  if(!x){m.append(el('p','empty',MQ.done?`本輪完成：${MQ.done} 題，答對 ${MQ.ok} 題。`:(S.mcqFilter||'due')==='due'?'目前沒有到期的題目。先做「未作答」，答過的題目會依熟練度排入複習；答對的原題，其變化題排在第3天。':'沒有符合條件的題目。'),
     Object.assign(el('button','btn good','再來一輪'),{onclick:()=>{MQ=null;viewMCQ()}}));return}
-  const pick=MQ.pick[id],reveal=pick!==undefined;
-  m.append(el('p','count',`第 ${MQ.i+1} / ${MQ.ids.length} 題｜本輪答對 ${MQ.ok} / ${MQ.done}｜按 1–4 或 A–D 作答，Enter 下一題`));
-  const card=mcqCard(x,pick,i=>{MQ.pick[id]=i;MQ.done++;const ok=i===x.a;if(ok)MQ.ok++;mcqMark(x,ok,false);
-    if(!ok&&MQ.ids.indexOf(id,MQ.i+1)<0)MQ.ids.splice(Math.min(MQ.i+6,MQ.ids.length),0,id);  // 答錯：約5題後同輪再考一次
-    viewMCQ()},reveal);m.append(card);
+  const pick=MQ.pick[id],reveal=pick!==undefined,ctx=MQ.ctx[id];
+  m.append(el('p','count',`第 ${MQ.i+1} / ${MQ.ids.length} 題｜本輪答對 ${MQ.ok} / ${MQ.done}${ctx==='reinforce'?'｜即時補強':''}｜按 1–4 或 A–D 作答，Enter 下一題`));
+  const answer=(i,guess)=>{const ok=i===x.a&&!guess;if(!guess){MQ.pick[id]=i;MQ.done++;if(ok)MQ.ok++}
+    const next=mcqMark(x,ok,ctx||'practice');MQ.res[id]=next||(ctx==='reinforce'&&ok?'ok':null);
+    if(next==='reinforce'){const v=x.grp+'v',j=MQ.ids.indexOf(v,MQ.i+1);if(j>0)MQ.ids.splice(j,1);MQ.ids.splice(MQ.i+1,0,v);MQ.ctx[v]='reinforce'}
+    viewMCQ()};
+  const note=reveal&&MCQ_NOTE[MQ.res[id]];if(note)m.append(el('p','mcq-note',note));
+  m.append(mcqCard(x,pick,answer,reveal,MQ.res[id]==='weak'));
   if(reveal){const act=el('div','essay-action');
-    if(pick===x.a){const g=el('button','btn','我是猜對的（明天再考）');g.onclick=()=>{const s=S.mcq[id];s.n--;mcqMark(x,true,true);g.disabled=true;g.textContent='已排入明天複習'};act.append(g)}
+    if(pick===x.a&&!MQ.res[id]&&ctx!=='reinforce'){const g=el('button','btn','我是猜對的');g.title='視同答錯：原題明天再考，並立即出變化題補強';g.onclick=()=>{const s=S.mcq[id];s.n--;answer(pick,true)};act.append(g)}
     const nx=el('button','btn good','下一題 ▶');nx.dataset.next='';nx.onclick=()=>{MQ.i++;viewMCQ();window.scrollTo({top:0,behavior:'auto'})};act.prepend(nx);m.append(act)}
 }
 function mcqExam(m,items){
   if(!MX||MX.s!==mcqSubj()){
-    const pick=el('div','essay-action');m.append(el('p','lead','模擬考：隨機抽題、計時作答，交卷後才對答案；成績會計入各題複習排程。時間以每題 72 秒計（50 題 60 分鐘）。'),pick);
-    [10,25,50].filter(n=>n<=items.length).forEach(n=>{const b=el('button','btn good',`${n} 題｜${Math.round(n*1.2)} 分鐘`);b.onclick=()=>{
-      MX={s:mcqSubj(),ids:[...items].sort(()=>Math.random()-.5).slice(0,n).map(x=>x.id),ans:{},i:0,end:Date.now()+n*72000,done:false};viewMCQ()};pick.append(b)});return}
-  const xs=MX.ids.map(id=>MCQ.items.find(y=>y.id===id));
+    const pick=el('div','essay-action');m.append(el('p','lead','模擬考：每個考點隨機抽原題或變化題其中一題，計時作答，交卷後才對答案；成績計入複習排程。時間以每題 72 秒計（50 題 60 分鐘）。'),pick);
+    const grps=[...new Set(items.map(x=>x.grp))];
+    [10,25,50].filter(n=>n<=grps.length).forEach(n=>{const b=el('button','btn good',`${n} 題｜${Math.round(n*1.2)} 分鐘`);b.onclick=()=>{
+      MX={s:mcqSubj(),ids:grps.sort(()=>Math.random()-.5).slice(0,n).map(g=>Math.random()<.5?g:g+'v'),ans:{},i:0,end:Date.now()+n*72000,done:false};viewMCQ()};pick.append(b)});return}
+  const xs=MX.ids.map(mcqById);
   if(MX.done){const ok=xs.filter(x=>MX.ans[x.id]===x.a).length;
     m.append(el('p','mcq-score',`得分 ${Math.round(ok/xs.length*100)}｜答對 ${ok} / ${xs.length}`));
     const again=el('button','btn good','再考一次');again.onclick=()=>{MX=null;viewMCQ()};m.append(again);
     xs.filter(x=>MX.ans[x.id]!==x.a).forEach(x=>{const d=el('details','essay-variant',`<summary>${esc(x.topic)}｜你選 ${MX.ans[x.id]==null?'未答':'ABCD'[MX.ans[x.id]]}，正解 ${'ABCD'[x.a]}</summary>`);d.append(mcqCard(x,MX.ans[x.id],null,true));m.append(d)});return}
   const x=xs[MX.i],clock=el('span','mcq-clock');
   const tick=()=>{const s=Math.max(0,Math.round((MX.end-Date.now())/1000));clock.textContent='剩餘 '+clockText(s);if(!s)finish()};
-  const finish=()=>{stopMcqTimer();MX.done=true;xs.forEach(y=>mcqMark(y,MX.ans[y.id]===y.a,false));viewMCQ()};
+  const finish=()=>{stopMcqTimer();MX.done=true;xs.forEach(y=>mcqMark(y,MX.ans[y.id]===y.a,'exam'));viewMCQ()};
   const grid=el('div','mcq-grid');xs.forEach((y,i)=>{const b=el('button',null,String(i+1));b.dataset.on=MX.ans[y.id]!==undefined;b.setAttribute('aria-current',i===MX.i);b.onclick=()=>{MX.i=i;viewMCQ()};grid.append(b)});
   const act=el('div','essay-action'),prev=el('button','btn','◀ 上一題'),next=el('button','btn','下一題 ▶'),sub=el('button','btn bad','交卷');
   prev.disabled=MX.i===0;next.disabled=MX.i===xs.length-1;prev.onclick=()=>{MX.i--;viewMCQ()};next.onclick=()=>{MX.i++;viewMCQ()};next.dataset.next='';
@@ -956,25 +1006,97 @@ function mcqExam(m,items){
   const top=el('div','essay-toolbar');top.append(clock,el('span','count',`第 ${MX.i+1} / ${xs.length} 題｜已答 ${Object.keys(MX.ans).length}`));
   m.append(top,grid,mcqCard(x,MX.ans[x.id],i=>{MX.ans[x.id]=i;if(MX.i<xs.length-1)MX.i++;viewMCQ()},false),act);
   tick();mcqTimer=setInterval(tick,1000)}
+const pct=r=>r.n?Math.round(r.ok/r.n*100)+'%':'—';
+function mcqTable(head,rows,cell,act){const tb=el('table','mcq-table',`<thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead>`),body=el('tbody');
+  rows.forEach(r=>{const tr=el('tr',null,cell(r).map(c=>`<td>${c}</td>`).join('')),b=el('button','chip',act[0]);b.onclick=()=>act[1](r);tr.cells[0].append(' ',b);if(r.n&&r.ok/r.n<.6)tr.className='weak';body.append(tr)});
+  tb.append(body);const wrap=el('div','mcq-tablewrap');wrap.append(tb);return wrap}
 function mcqAnalysis(m,items){
-  const rows=mcqWeak(items).sort((a,b)=>b.q-a.q);
-  const tb=el('table','mcq-table','<thead><tr><th>法規</th><th>本題庫題數</th><th>已作答</th><th>最近答對率</th><th></th></tr></thead>');const body=el('tbody');
-  rows.forEach(r=>{const tr=el('tr',null,`<td>${esc(lawShort(r.law))}</td><td>${r.q}</td><td>${r.n}</td><td>${r.n?Math.round(r.ok/r.n*100)+'%':'—'}</td>`);
-    const td=el('td'),b=el('button','chip','練這部');b.onclick=()=>{S.mcqLaw=r.law;S.mcqFilter='all';S.mcqTab='practice';MQ=null;save();viewMCQ()};td.append(b);tr.append(td);if(r.n&&r.ok/r.n<.6)tr.className='weak';body.append(tr)});
-  tb.append(body);const wrap=el('div','mcq-tablewrap');wrap.append(tb);
-  const weak=rows.filter(r=>r.n>=2).sort((a,b)=>a.ok/a.n-b.ok/b.n).slice(0,3);
-  m.append(el('p','lead',weak.length?`弱點（答過 2 題以上、答對率最低）：${weak.map(r=>`${esc(lawShort(r.law))} ${Math.round(r.ok/r.n*100)}%`).join('、')}`:'先作答幾題，這裡會依法規列出你的弱點。'),
-    wrap);
+  const go=q=>{S.mcqTab='practice';save();MQ=q;viewMCQ();window.scrollTo({top:0,behavior:'auto'})};
+  const topics=mcqStat(items,x=>[x.grp]).filter(r=>r.n).map(r=>({...r,x:mcqById(r.k)})).sort((a,b)=>(!!S.mcq[b.k]?.wk-!!S.mcq[a.k]?.wk)||a.ok/a.n-b.ok/b.n||b.n-a.n).slice(0,20);
+  m.append(el('h3',null,'弱點考點前 20 名（原題＋變化題累計；標記「弱點」者優先）'),
+    topics.length?mcqTable(['考點','狀態','作答','答對率'],topics,r=>[`${esc(r.x.topic)}<br><small class="essay-notice">${r.k}</small>`,mcqTag(r.x)||'—',r.n,pct(r)],
+      ['練這組',r=>go({custom:'考點：'+r.x.topic,ids:[r.k,r.k+'v'],i:0,pick:{},ctx:{},res:{},ok:0,done:0})]):el('p','essay-notice','先作答幾題，這裡會列出答對率最低的考點。'));
+  const laws=mcqStat(items,x=>[...new Set(x.refs.map(r=>r[0]))]).sort((a,b)=>b.q-a.q);
+  m.append(el('h3',null,'法規掌握度'),mcqTable(['法規','題數','作答','答對率'],laws,r=>[esc(lawShort(r.k)),r.q,r.n,pct(r)],
+    ['練這部',r=>{S.mcqLaw=r.k;S.mcqFilter='all';MQ=null;go(null)}]));
   const a=el('details','essay-variant','<summary>出題規律分析（題庫製作者回測報告原文）</summary>');a.append(el('div','mcq-analysis',linkRefs(MCQ.analysis)));
-  m.append(a,el('p','essay-source-note',`來源：${esc(MCQ.source)}。「命題依據」與預測是依歷屆統計推估，不代表真實命題；法條以本App法規庫版本日期為準。`))}
+  m.append(a,el('p','essay-source-note',`來源：${esc(MCQ.source)}。「命題依據」與預測是依歷屆統計推估，不代表真實命題；歷屆真題取自你的 Y.C. 題庫；法條以本App法規庫版本日期為準。`))}
 document.addEventListener('keydown',e=>{if(S.mode!=='mcq'||e.target.closest('input,textarea,select')||document.querySelector('dialog[open]')||e.ctrlKey||e.metaKey||e.altKey)return;
   const k=e.key.toUpperCase(),i='1234'.indexOf(k)>=0?'1234'.indexOf(k):'ABCD'.indexOf(k);
-  if(i>=0){const b=document.querySelectorAll('#main .mcq-opt')[i];if(b){e.preventDefault();b.click()}}
+  if(i>=0){const b=document.querySelectorAll('#main .mcq-card button.mcq-opt')[i];if(b){e.preventDefault();b.click()}}
   else if(e.key==='Enter'||e.key==='ArrowRight'){const n=document.querySelector('#main [data-next]:not(:disabled)');if(n){e.preventDefault();n.click()}}});
+/* 29a 國文作文：範文逐段回想、挖空名言成語、朗讀、默寫；名言成語閃卡；歷屆題套用練習；完整講義（原文照錄）。
+   範文不改寫。進度存 S.comp：{鍵:{b,due}}；默寫存 S.compDraft：{範文id:文字}。 */
+let COMP;
+async function loadComp(){if(COMP)return COMP;const r=await fetch('data/composition.json');if(!r.ok)throw new Error(r.status);return COMP=await r.json()}
+// 行內：粗體（範文中為替換位置）、連結；先跳脫。
+const mdInline=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+// 簡易 Markdown：標題、表格、引言、清單、段落。
+function mdHtml(md){const out=[],ls=md.split('\n');let i=0;
+  while(i<ls.length){const l=ls[i];
+    if(/^#{1,4} /.test(l)){const n=l.match(/^#+/)[0].length;out.push(`<h${n+1}>${mdInline(l.slice(n+1))}</h${n+1}>`);i++}
+    else if(l.startsWith('|')){const rows=[];while(ls[i]?.startsWith('|'))rows.push(ls[i++].replace(/^\||\|$/g,'').split(' | ').map(c=>mdInline(c.trim())));
+      out.push(`<div class="mcq-tablewrap"><table class="mcq-table comp-table"><thead><tr>${rows[0].map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows.slice(2).map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`)}
+    else if(l.startsWith('>')){const q=[];while(ls[i]?.startsWith('>'))q.push(ls[i++].replace(/^>\s?/,''));out.push(`<blockquote>${q.map(mdInline).join('<br>')}</blockquote>`)}
+    else if(/^(- |\d+\. )/.test(l)){const tag=l.startsWith('- ')?'ul':'ol',it=[];while(/^(- |\d+\. )/.test(ls[i]||''))it.push(ls[i++].replace(/^(- |\d+\. )/,''));out.push(`<${tag}>${it.map(t=>`<li>${mdInline(t)}</li>`).join('')}</${tag}>`)}
+    else{if(l.trim())out.push(`<p>${mdInline(l)}</p>`);i++}}
+  return out.join('')}
+// 本篇挖空鍵：範文「本篇可背」；萬用範文無清單者，取速背表名言、成語及俗諺中出現於本文者。名言以「；」拆句。
+const compKeys=e=>{const all=e.keys.length?e.keys:[...COMP.quotes.map(q=>q.q),...COMP.idioms.map(x=>x.w),'樹高千尺不忘根，水流萬里不忘源'];
+  return [...new Set(all.flatMap(k=>k.split('；')))].filter(k=>e.paras.some(([,p])=>p.includes(k))).sort((a,b)=>b.length-a.length)};
+const compPara=(t,keys,cz)=>{if(!cz)return mdInline(t);let s=t;keys.forEach((k,i)=>{s=s.split(k).join(`\u0001${i}\u0002`)});
+  return mdInline(s).replace(/\u0001(\d+)\u0002/g,(_,i)=>`<span class="cz hid">${esc(keys[i])}</span>`)};
+const compDue=k=>S.comp[k]?.due<=Date.now(),compNew=k=>!S.comp[k];
+const compGrade=(k,ok)=>{const b=ok?Math.min((S.comp[k]?.b||0)+1,MCQ_DAYS.length-1):0;S.comp[k]={b,due:Date.now()+(ok?MCQ_DAYS[b]*DAY:0)};save()};
+let compRev=0;
+function viewComp(){const m=$('#main');m.className='comp';
+  const tabs=el('div','essay-toolbar');[['essay','範文背誦'],['cards','名言成語閃卡'],['apply','歷屆題套用'],['doc','完整講義']].forEach(([id,n])=>{const b=el('button','chip',n);b.setAttribute('aria-pressed',(S.compTab||'essay')===id);b.onclick=()=>{S.compTab=id;save();viewComp()};tabs.append(b)});
+  m.replaceChildren(el('h2','ch','國文作文'),el('p','lead','作文80%＋測驗20%，2小時。範文為提供者逐字校對之原文；勤務經驗是示範，請換成你自己的真實經驗（人名、地點去識別化）。'),tabs);
+  ({essay:compEssay,cards:compCards,apply:compApply,doc:m=>m.append(el('div','comp-doc',mdHtml(COMP.md.slice(COMP.md.indexOf('## 一、')))))})[S.compTab||'essay'](m)}  // 講義略去開頭「給接手AI的說明」
+function compEssay(m){
+  const e=COMP.essays.find(x=>x.id===S.compPick)||COMP.essays[0],keys=compKeys(e),pick=el('div','essay-toolbar');
+  COMP.essays.forEach(x=>{const b=el('button','chip',esc(x.title));b.setAttribute('aria-pressed',x===e);b.onclick=()=>{S.compPick=x.id;compRev=0;save();viewComp()};pick.append(b)});
+  const box=el('div','comp-paras');box.dataset.cz='';
+  const items=e.paras.map(([lab,t],i)=>{const shown=i<compRev,p=el('div','comp-para'+(shown?'':' pending'),`<span class="comp-lab">【${esc(lab)}】</span>${shown?compPara(t,keys,S.compCloze):'先回想：這段寫什麼？用了哪句名言、哪個經驗？'}`);box.append(p);return{t,p}});
+  const act=el('div','essay-action'),next=el('button','btn good',compRev>=e.paras.length?'已全部揭露':'揭露下一段');next.disabled=compRev>=e.paras.length;next.dataset.next='';
+  next.onclick=()=>{compRev++;viewComp()};
+  const all=el('button','btn','揭露全部');all.onclick=()=>{compRev=e.paras.length;viewComp()};
+  const re=el('button','btn','重新回想');re.onclick=()=>{compRev=0;viewComp()};
+  const cz=el('button','btn',S.compCloze?'取消挖空':'挖空名言成語');cz.onclick=()=>{S.compCloze=!S.compCloze;save();viewComp()};
+  act.append(next,all,re,cz,sayBtn('朗讀全文',()=>{compRev=e.paras.length;viewComp();const ps=[...document.querySelectorAll('.comp-para')];ttsPlay(e.paras.map(([,t],i)=>({text:t.replace(/\*\*/g,''),el:ps[i]})))}));
+  const k='e:'+e.id,g=el('div','essay-grade');g.append(el('div','essay-grade-title','這篇能不看範文寫出骨架嗎？'));
+  [['不熟｜今天再練',false],['能寫出｜依1、3、7、14天複習',true]].forEach(([n,ok])=>{const b=el('button','btn',n);b.onclick=()=>{compGrade(k,ok);viewComp()};g.append(b)});
+  if(S.comp[k])g.append(el('span','essay-notice',`下次複習：${new Date(S.comp[k].due).toLocaleDateString('zh-TW')}`));
+  S.compDraft||={};const ta=el('textarea');ta.maxLength=3000;ta.value=S.compDraft[e.id]||'';ta.placeholder='默寫或改寫成你自己的版本（自動存在本裝置，納入備份）';
+  const cnt=el('span','count'),upd=()=>{cnt.textContent=`${ta.value.replace(/\s/g,'').length} 字（不含空白）`};let tt;
+  ta.oninput=()=>{upd();clearTimeout(tt);tt=setTimeout(()=>{S.compDraft[e.id]=ta.value;save()},400)};upd();
+  const draft=el('details','essay-variant','<summary>默寫區</summary>');draft.append(ta,cnt);
+  m.append(pick,el('h3',null,esc(e.head)),...(e.prompt?[el('div','comp-prompt',mdHtml(e.prompt))]:[]),el('div','essay-review',mdInline((e.prompt?'立意：':'')+e.idea)),act,box,
+    ...(e.recite?[el('p','essay-source-note',mdInline('本篇可背：'+e.recite))]:[]),g,draft)}
+// 閃卡：名言（看白話與適用主題→說出名言與出處）、成語（看前半→補完）。到期與未練者優先。
+function compCards(m){
+  const used=w=>COMP.essays.filter(e=>e.paras.some(([,p])=>p.includes(w))).map(e=>e.title).join('、')||'範文未用';
+  const deck=[...COMP.quotes.map((q,i)=>({k:'q:'+i,f:`白話：${esc(q.mean)}<br><small>適用：${esc(q.use)}</small>`,b:`<b>${esc(q.q)}</b><br>${esc(q.src)}`})),
+    ...COMP.idioms.map(x=>({k:'i:'+x.w,f:`${esc(x.g)}${x.neg?'（反面）':''}<br><b class="comp-big">${esc(x.w.slice(0,2))}＿＿</b>`,b:`<b class="comp-big">${esc(x.w)}</b><br><small>${esc(x.g)}｜用於：${esc(used(x.w))}</small>`}))];
+  const q=[...deck.filter(c=>compDue(c.k)).sort((a,b)=>S.comp[a.k].due-S.comp[b.k].due),...deck.filter(c=>compNew(c.k))],c=q[0];
+  m.append(el('p','count',`名言 ${COMP.quotes.length}＋成語 ${COMP.idioms.length}｜待練 ${q.length}｜熟練（第3盒以上）${deck.filter(c=>S.comp[c.k]?.b>=3).length}`));
+  if(!c){m.append(el('p','empty','目前沒有到期的卡片。答對的卡片依1、3、7、14、30天再出現。'));return}
+  const card=el('div','comp-card',c.f),act=el('div','essay-action'),flip=el('button','btn good','翻面');flip.dataset.next='';
+  flip.onclick=()=>{card.innerHTML=c.b;act.replaceChildren(...[['不熟（再出現）',false],['記得',true]].map(([n,ok])=>Object.assign(el('button','btn'+(ok?' good':''),n),{onclick:()=>{compGrade(c.k,ok);viewComp()}})))};
+  act.append(flip);m.append(card,act)}
+// 歷屆題套用：看題目，先說出「根本／精進／結論一句話」，再對照套用表。
+function compApply(m){
+  m.append(el('p','lead','看題目→先說出「根本」「精進」與合段結論一句話→再揭曉對照。'));
+  COMP.apply.forEach((r,i)=>{const k='a:'+i,d=el('div','comp-card comp-apply',`<b>${esc(r.t)}</b>`),b=el('button','btn','揭曉');
+    b.onclick=()=>{d.lastChild.before(el('div','essay-review',`根本：${esc(r.root)}<br>精進：${esc(r.adv)}<br>結論：<b>${esc(r.end)}</b>`));
+      b.replaceWith(...[['沒想到',false],['想到了',true]].map(([n,ok])=>Object.assign(el('button','btn'+(ok?' good':''),n),{onclick:e=>{compGrade(k,ok);e.target.parentNode.replaceChildren(el('span','essay-notice','已記錄'))}})))};
+    const st=S.comp[k];d.append(el('span','essay-notice',st?(st.b?'上次：想到了':'上次：沒想到'):''),el('div','essay-action'));d.lastChild.append(b);m.append(d)})}
 async function render(){
   if(S.mode!=='vn'){document.body.classList.remove('vn-screen','vn-writing-mode','vn-keyboard')}
   ttsStop();stopMcqTimer();save();
   if(S.mode==='mcq'){try{await loadMCQ()}catch(e){header();$('#main').replaceChildren(el('p','empty','選擇題資料載入失敗，請確認 data/mcq.json 已與頁面一起部署。'));return}}
+  if(S.mode==='comp'){header();document.querySelector('.wrap').classList.remove('vn-layout');document.querySelector('.wrap').classList.add('essay-layout');stopEssayTimer();
+    try{await loadComp()}catch(e){$('#main').replaceChildren(el('p','empty','作文資料載入失敗，請確認 data/composition.json 已與頁面一起部署。'));return}return viewComp()}
   header();
   document.querySelector('.wrap').classList.toggle('essay-layout',(S.mode==='essay'||S.mode==='mcq')&&!$('#q').value.trim());
   document.querySelector('.wrap').classList.toggle('vn-layout',S.mode==='vn'&&!$('#q').value.trim());
@@ -1000,7 +1122,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原（不需要網路，也不連至第三方服務）。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-28d';
+const BACKUP_APP_VERSION='tb-2026-10-29a';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
@@ -1027,7 +1149,7 @@ $('#backup-file').onchange=async e=>{
     if(parsed?.format!==BACKUP_FORMAT||parsed.schema!==1||!isRecord(data)||!isRecord(data['tb-v1'])||!isRecord(data[DRAFT_KEY])||!isRecord(data[ERROR_KEY]))
       throw new Error('格式或版本不符合記憶樹備份規格');
     const incoming=data['tb-v1'];
-    for(const k of ['known','cards','essayKnown','essayRecall','essaySelf','ch','essayPick','mcq'])if(incoming[k]!==undefined&&!isRecord(incoming[k]))throw new Error('進度欄位格式不正確：'+k);
+    for(const k of ['known','cards','essayKnown','essayRecall','essaySelf','ch','essayPick','mcq','comp','compDraft'])if(incoming[k]!==undefined&&!isRecord(incoming[k]))throw new Error('進度欄位格式不正確：'+k);
     const textMap=(obj,maxLength)=>Object.fromEntries(Object.entries(obj).filter(([k,v])=>/^(criminal|procedure|duty)-\d{2}$/.test(k)&&typeof v==='string').slice(0,60).map(([k,v])=>[k,v.slice(0,maxLength)]));
     const backupDrafts=textMap(data[DRAFT_KEY],5000),backupErrors=textMap(data[ERROR_KEY],1200);
     let storyBackup=data[STORY_KEY];
@@ -1048,15 +1170,15 @@ $('#backup-file').onchange=async e=>{
     }
     if(!confirm('確定匯入備份？將保留本機未衝突的題目紀錄；同一題若有衝突，以備份內容為準。\n建議先匯出本機資料留底。'))return;
     const keys=['tb-v1',DRAFT_KEY,ERROR_KEY,...(storyBackup!=null?[STORY_KEY]:[])],old=Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]));
-    const mergeKeys=['known','cards','essayKnown','essayRecall','essaySelf','ch','essayPick','mcq'];
+    const mergeKeys=['known','cards','essayKnown','essayRecall','essaySelf','ch','essayPick','mcq','comp','compDraft'];
     const nextS={...S};
-    const scalarKeys=['subject','mode','recite','eink','onlyWeak','essayFilter','mcqSubj','mcqFilter','mcqTab','mcqShuffle'];
+    const scalarKeys=['subject','mode','recite','eink','onlyWeak','essayFilter','mcqSubj','mcqFilter','mcqTab','mcqShuffle','compTab','compPick','compCloze'];
     for(const k of scalarKeys)if(Object.hasOwn(incoming,k))nextS[k]=incoming[k];
     for(const k of mergeKeys)nextS[k]={...(isRecord(S[k])?S[k]:{}),...(isRecord(incoming[k])?incoming[k]:{})};
     if(!SUBJECTS.some(([id])=>id===nextS.subject))nextS.subject='criminal';
     if(!MODES.some(([id])=>id===nextS.mode))nextS.mode='essay';
     if(!['all','priority','review','errors'].includes(nextS.essayFilter))nextS.essayFilter='all';
-    if(!['due','new','wrong','all'].includes(nextS.mcqFilter))delete nextS.mcqFilter;if(!['practice','exam','analysis'].includes(nextS.mcqTab))delete nextS.mcqTab;
+    if(!['due','new','wrong','weak','all','var'].includes(nextS.mcqFilter))delete nextS.mcqFilter;if(!['practice','exam','analysis'].includes(nextS.mcqTab))delete nextS.mcqTab;
     const mergedDrafts={...essayDrafts,...backupDrafts},mergedErrors={...essayErrors,...backupErrors};
     try{localStorage.setItem('tb-v1',JSON.stringify(nextS));localStorage.setItem(DRAFT_KEY,JSON.stringify(mergedDrafts));localStorage.setItem(ERROR_KEY,JSON.stringify(mergedErrors));if(storyBackup!=null){const currentStory=(()=>{try{return JSON.parse(localStorage.getItem(STORY_KEY)||'null')}catch(e){return null}})();const mergedStory={schema:2,chapters:{...(isRecord(currentStory?.chapters)?currentStory.chapters:{}),...storyBackup.chapters},lastChapterId:storyBackup.lastChapterId||currentStory?.lastChapterId||null};localStorage.setItem(STORY_KEY,JSON.stringify(mergedStory))}}
     catch(err){for(const k of keys){try{old[k]===null?localStorage.removeItem(k):localStorage.setItem(k,old[k])}catch(_){}}throw err}
