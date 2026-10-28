@@ -1,4 +1,4 @@
-升官等記憶樹｜tb-2026-10-28c_Claude（候選版；正式核准版為 tb-2026-10-25c）
+升官等記憶樹｜tb-2026-10-28c_Claude（正式核准版，2026-10-28 使用者確認）
 
 【部署】
 把 ZIP 解壓後的全部檔案，依原路徑覆蓋到 GitHub repo 根目錄（含 story/、assets/、data/、icons/、.nojekyll）。
