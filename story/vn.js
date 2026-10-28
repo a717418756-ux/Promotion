@@ -1,11 +1,12 @@
 /* LAW//SHIFT VN educational candidate. Uses only approved essay answers from existing essay-memory.json. */
 (function(){'use strict';
  const VNKEY='tb-vn-v2', LEGACY_KEY='tb-vn-v1'; let episodes=null,chosen=null,game=null,mainRoot=null;const LAWIDX={};let selectedId='';
- const VERSION='tb-2026-10-28c',REV=4;
+ const VERSION='tb-2026-10-28d',REV=4;
  const screenHeight=()=>{let v=window.visualViewport;document.documentElement.style.setProperty('--vn-screen-h',Math.round(v?.height||window.innerHeight)+'px');};
  window.addEventListener('resize',screenHeight,{passive:true});window.visualViewport?.addEventListener('resize',screenHeight,{passive:true});
  const sceneMode=(kind)=>{document.body.classList.toggle('vn-screen',!!kind);document.body.classList.toggle('vn-writing-mode',kind==='writing');if(kind)screenHeight();else document.body.classList.remove('vn-keyboard');};
  const el=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=text;return x};
+ const lp=(cls,text)=>{const x=el('p',cls);if(typeof linkLaw==='function')x.innerHTML=linkLaw(text);else x.textContent=text;return x};  // 解析中的條號、字號可點開全文
  const btn=(label,handler,cls='vn-btn')=>{const b=el('button',cls,label);b.type='button';b.addEventListener('click',handler);return b};
  const savedAll=()=>{
   let cur=null;
@@ -160,9 +161,9 @@
   const test=slide.quiz,entry=game.answers[test.id],right=test.options.find(x=>x.valid),pick=test.options.find(x=>x.id===entry?.opt);
   pane.append(el('span','vn-panel-tag','⚖ 本幕研判 · '+test.law),el('h3',null,test.title));const body=panelBody(pane);
   if(game.mode==='easy'&&pick){body.append(el('p','vn-result',pick.valid?'✓ 判斷正確':'✗ 這個判斷有誤'));
-    if(!pick.valid)body.append(el('p','vn-feedback-brief','你選的錯在：'+pick.trap),el('p','vn-feedback-brief','正解：'+right.text));}
+    if(!pick.valid)body.append(lp('vn-feedback-brief','你選的錯在：'+pick.trap),lp('vn-feedback-brief','正解：'+right.text));}
   else body.append(el('p','vn-result','已記下你的回答；請對照下列要點自我核對（非 AI 評分）。'));
-  body.append(el('p','vn-feedback-brief',test.easyExplanation),el('p','vn-feedback-brief','記憶鏈：'+test.rubric.join(' → ')));
+  body.append(lp('vn-feedback-brief',test.easyExplanation),el('p','vn-feedback-brief','記憶鏈：'+test.rubric.join(' → ')));
   if(test.refs.length){const refs=el('div','vn-refs');test.refs.forEach(([law,a])=>refs.append(btn('📖 '+(/^\d/.test(a)?law+' §'+a:a),()=>window.openLaw?.(law,a),'vn-mini')));body.append(refs);
    const other=[...new Set(test.refs.flatMap(([law,a])=>[...(LAWIDX[law+'§'+a]||[])]))].filter(id=>id!==chosen.id);
    if(other.length){const links=el('div','vn-refs');links.append(el('span','vn-feedback-brief','同條文也考在：'));other.slice(0,6).forEach(id=>{const c=episodes.chapters.find(x=>x.id===id),it=caseFor(c);
