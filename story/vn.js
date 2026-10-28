@@ -1,7 +1,7 @@
 /* LAW//SHIFT VN educational candidate. Uses only approved essay answers from existing essay-memory.json. */
 (function(){'use strict';
  const VNKEY='tb-vn-v2', LEGACY_KEY='tb-vn-v1'; let episodes=null,chosen=null,game=null,mainRoot=null;const LAWIDX={};let selectedId='';
- const VERSION='tb-2026-10-27c',REV=4;
+ const VERSION='tb-2026-10-28c',REV=4;
  const screenHeight=()=>{let v=window.visualViewport;document.documentElement.style.setProperty('--vn-screen-h',Math.round(v?.height||window.innerHeight)+'px');};
  window.addEventListener('resize',screenHeight,{passive:true});window.visualViewport?.addEventListener('resize',screenHeight,{passive:true});
  const sceneMode=(kind)=>{document.body.classList.toggle('vn-screen',!!kind);document.body.classList.toggle('vn-writing-mode',kind==='writing');if(kind)screenHeight();else document.body.classList.remove('vn-keyboard');};
@@ -91,8 +91,8 @@
   document.querySelector('#main').replaceChildren(out);mainRoot=out;
   if(writing){if(game.phase==='final')renderFinal(out);else renderEnd(out);return;}
   const shell=el('div','vn-shell');const stage=el('div','vn-stage');stage.setAttribute('aria-label',slide.label+'劇情畫面');
-  const bg=el('img','vn-background');bg.src=image(slide.bg);bg.alt=slide.label+'插畫背景';stage.append(bg);
-  slide.chars.forEach((name,i)=>{const pic=el('img','vn-portrait '+(i?'right':'left'));pic.src=image(name);pic.alt=({'senior':'警察學長','player':'承辦警員','reporter':'報案人','suspect':'甲','mother':'甲的母親'}[name]||name)+'立繪';stage.append(pic)});
+  const bg=el('img','vn-background');bg.onerror=()=>{bg.onerror=null;bg.src=image('station')};bg.src=image(slide.bg);bg.alt=slide.label+'插畫背景';stage.append(bg);
+  slide.chars.forEach((name,i)=>{const pic=el('img','vn-portrait '+(i?'right':'left'));pic.onerror=()=>pic.remove();pic.src=image(name);pic.alt=({senior:'警察學長',player:'承辦警員',reporter:'報案人',suspect:'甲',mother:'甲的母親',chief:'警官',citizen:'民眾',staff:'職員',lawyer:'律師',prosecutor:'檢察官',judge:'法官',officer_f:'女警官',youth:'少年',indigenous:'部落長者'}[name]||name)+'立繪';stage.append(pic)});
   const heading=el('div','vn-head');const label=el('span','vn-chapter',(game.slide+1)+'/'+chosen.slides.length+' · '+slide.label);
   const acts=el('div','vn-actions');const toggle=btn(game.mode==='easy'?'簡易 ◇':'困難 ✎',()=>{game.mode=game.mode==='easy'?'hard':'easy';saveVN();draw()},'vn-mini');toggle.setAttribute('aria-label','切換簡易選擇與困難輸入');
   acts.append(toggle,btn('⋯',()=>showTools(slide),'vn-mini'),btn('退出',leaveScene,'vn-mini'));

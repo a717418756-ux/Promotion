@@ -149,6 +149,7 @@ mark{background:var(--sealbg);color:inherit;border-radius:2px}
 .essay-step{flex:1 1 160px;min-width:0;display:flex;align-items:center;gap:9px;border:1px solid var(--jade);border-radius:9px;padding:10px;background:var(--jadebg);animation:essay-pop .28s ease-out both}
 .essay-step .seq{font:700 12px var(--f-ref);display:grid;place-items:center;border-radius:50%;background:var(--jade);color:var(--panel);width:25px;height:25px;flex:none}
 .essay-step span:last-child{font-weight:700;font-size:14px;overflow-wrap:anywhere}
+.essay-step .cue{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:3px}.essay-links{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.essay-links .chip{white-space:normal;text-align:left;max-width:100%}.essay-links small{color:var(--muted)}
 .essay-step.pending{border-style:dashed;border-color:var(--line);background:var(--panel);color:var(--muted)}
 .essay-step.pending .seq{background:var(--line);color:var(--ink)}
 .essay-action{display:flex;flex-wrap:wrap;gap:7px}
@@ -306,7 +307,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-27c 候選版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-28c 候選版</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -316,6 +317,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
           <button class="chip" id="backup" title="備份熟練紀錄、申論草稿及錯漏註記">匯出備份</button>
           <button class="chip" id="restore" title="由已匯出的記憶樹 JSON 備份還原">匯入備份</button>
           <button class="chip" id="help" title="離線、資料保護與測試說明">使用說明</button>
+          <button class="chip" id="ver-btn" title="查看目前版本、強制更新">版本／更新</button>
           <input id="backup-file" type="file" accept=".json,application/json" hidden aria-label="選擇備份 JSON 檔案">
         </div>
       </div>
@@ -338,6 +340,12 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
   <p><strong>朗讀：</strong>使用裝置內建語音（需中文語音包；離線可用與否依裝置）。底部控制列可暫停、上下段、調語速與「題答間停頓」，停頓時間就是自我回想時間。</p>
   <p><strong>挖空回想：</strong>申論答案可遮住條號、判決字號與時限數字，先想再點，點開即計入已揭示。</p>
   <form method="dialog"><button class="btn">關閉</button></form>
+</dialog>
+<dialog class="data-help" id="ver-dialog" aria-labelledby="ver-title">
+  <h2 id="ver-title">版本與更新</h2>
+  <p id="ver-info">讀取中…</p>
+  <p class="essay-notice">「強制更新」只清除本 App 的離線快取並重新下載最新檔案；熟練進度、申論草稿、錯漏註記與劇情紀錄都存在本機，不會被清除。</p>
+  <div class="row"><button class="btn good" id="ver-force">強制更新</button><form method="dialog" style="margin-left:auto"><button class="btn">關閉</button></form></div>
 </dialog>
 <dialog class="law-dialog" id="law-dialog" aria-labelledby="law-title">
   <header><h2 id="law-title"></h2><span class="ver" id="law-ver"></span></header>
@@ -435,6 +443,9 @@ const parseCases=s=>[...String(s??'').matchAll(CASE_RE)].flatMap(m=>m[1]?[{i:m.i
   :[...m[0].matchAll(/(?:釋字)?第?(\d+)號?/g)].map(p=>({i:m.index+p.index,j:m.index+p.index+p[0].length,law:CASE_LAW,a:`釋字第${p[1]}號`})));
 const withCases=parse=>s=>[...parse(s),...parseCases(s)].sort((x,y)=>x.i-y.i);
 const linkRefs=s=>linkHtml(s,withCases(parseRefs)), linkLaw=(s,def)=>linkHtml(s,withCases(t=>parseProse(t,def)));
+// 申論題之間的連結：以答案引用之條文、解釋及法規名稱為鍵，找共用者。
+const ESSAY_REFS=new Map(),refsOf=x=>{if(!ESSAY_REFS.has(x.id))ESSAY_REFS.set(x.id,new Set(withCases(t=>parseProse(t,SUBJECT_LAW[x.subject]))(x.answer).map(r=>r.law===CASE_LAW?r.a:r.law+'§'+r.a).concat(LAW_KEYS.filter(k=>x.answer.includes(k)).map(k=>LAW_ALIAS[k]))));return ESSAY_REFS.get(x.id)};
+const refName=k=>{const [law,a]=k.split('§');return a?(LAW_KEYS.filter(n=>LAW_ALIAS[n]===law).sort((x,y)=>x.length-y.length)[0]||law)+'§'+a:law};
 let LAWS;
 async function loadLaws(){if(LAWS)return LAWS;const r=await fetch('data/laws.json');if(!r.ok)throw new Error(r.status);return LAWS=(await r.json()).laws}
 const artName=a=>/^\d/.test(a)?'第'+a.replace('-','條之')+(a.includes('-')?'':'條'):a;
@@ -690,7 +701,7 @@ function viewEssay(d,collection){
     const route=el('div','essay-route');route.setAttribute('aria-live','polite');route.setAttribute('aria-label','申論答案分段回想路徑');
     chosen.steps.forEach((step,i)=>{
       const shown=i<revealed;
-      const item=el('div','essay-step'+(shown?'':' pending'),`<span class="seq">${i+1}</span><span>${shown?esc(step):'第 '+(i+1)+' 段：先獨立回想'}</span>`);
+      const item=el('div','essay-step'+(shown?'':' pending'),`<span class="seq">${i+1}</span><span>${shown?esc(step):'第 '+(i+1)+' 段'}${chosen.cues?.[i]?`<small class="cue">${shown?'':'先想：'}${esc(chosen.cues[i])}</small>`:shown?'':'：先獨立回想'}</span>`);
       item.style.animationDelay=shown?Math.min(i,5)*35+'ms':'0ms';route.append(item);
     });
     const actions=el('div','essay-action');
@@ -766,6 +777,11 @@ function viewEssay(d,collection){
       };gradeBox.append(b);
     });
     (chosen.variants||[]).forEach(v=>content.push(el('details','essay-variant',`<summary>預測變化題｜${esc(v.title)}</summary><div class="essay-question">${linkLaw(v.question)}</div><ol>${v.points.map(t=>`<li>${linkLaw(t,SUBJECT_LAW[S.subject])}</li>`).join('')}</ol><p class="essay-notice">來源：${esc(v.source)}。要點依本題校訂答案與本App法規整理，不是完整參考答案。</p>`)));
+    const mine=refsOf(chosen),df=k=>ESSAY_DATA.items.filter(x=>refsOf(x).has(k)).length;  // 越少題共用的條文，關聯越強
+    const cur=(chosen.links||[]).map(l=>({x:ESSAY_DATA.items.find(y=>y.id===l.to),note:l.why})).filter(r=>r.x);
+    const auto=ESSAY_DATA.items.filter(x=>x!==chosen&&!cur.some(r=>r.x===x)).map(x=>{const s=[...refsOf(x)].filter(k=>mine.has(k)).sort((a,b)=>df(a)-df(b));return{x,note:'共用 '+s.slice(0,3).map(refName).join('、'),w:s.reduce((t,k)=>t+1/df(k),0)}}).filter(r=>r.w).sort((a,b)=>b.w-a.w).slice(0,2);
+    if(cur.length||auto.length){const box=el('div','essay-links',`<span class="essay-notice">相關題（先想兩題的異同，再點過去對照）：</span>`);
+      [...cur,...auto].forEach(({x,note})=>{const b=el('button','chip',`${esc(SUBJECTS.find(v=>v[0]===x.subject)[1])}${x.number}〈${esc(x.title)}〉<small> ${esc(note)}</small>`);b.onclick=()=>{S.subject=x.subject;S.essayPick[x.subject]=x.id;save();render()};box.append(b)});content.push(box)}
     content.push(gradeBox);
     const errorBox=el('section','essay-compose essay-errors'),errorTitle=el('h3',null,'本題錯漏註記（只存在此裝置）');
     const errorField=el('textarea');errorField.maxLength=1200;errorField.value=errorText;
@@ -852,7 +868,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原（不需要網路，也不連至第三方服務）。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-27c';
+const BACKUP_APP_VERSION='tb-2026-10-28c';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
@@ -918,6 +934,17 @@ $('#backup-file').onchange=async e=>{
   }catch(err){alert('匯入失敗，原本資料盡可能保留：'+err.message)}
 };
 $('#help').onclick=()=>$('#help-dialog').showModal();
+// 版本／更新：頁面版本、離線快取版本、線上最新版本；強制更新只清本 App 快取，不動 localStorage。
+const CACHE_PREFIX='promotion-tb-';
+$('#ver-btn').onclick=async()=>{const info=$('#ver-info');$('#ver-dialog').showModal();info.textContent='讀取中…';
+  const cached=('caches' in window)?(await caches.keys()).filter(k=>k.startsWith(CACHE_PREFIX)).map(k=>k.slice(10)):[];
+  let online='無法連線（離線中）';try{const t=await(await fetch('sw.js',{cache:'no-store'})).text();online=t.match(/const V = '([^']+)'/)?.[1]||'無法辨識'}catch(e){}
+  const same=cached.length===1&&cached[0]===BACKUP_APP_VERSION,newer=/^tb-/.test(online)&&online!==BACKUP_APP_VERSION;
+  info.innerHTML=`目前頁面版本：<b>${esc(BACKUP_APP_VERSION)}</b><br>離線快取版本：${esc(cached.join('、')||'尚未建立')}<br>線上最新版本：${esc(online)}<br>${newer?'⚠ 線上有新版本，請按「強制更新」。':same?'✓ 頁面、快取與線上版本一致。':'快取與頁面版本不一致，建議按「強制更新」。'}`};
+$('#ver-force').onclick=async()=>{$('#ver-info').textContent='更新中…';
+  try{if('serviceWorker' in navigator)for(const r of await navigator.serviceWorker.getRegistrations())await r.unregister();
+    if('caches' in window)for(const k of await caches.keys())if(k.startsWith(CACHE_PREFIX))await caches.delete(k)}catch(e){}
+  location.reload()};
 
 render();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(()=>{});

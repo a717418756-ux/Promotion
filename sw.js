@@ -1,5 +1,5 @@
 // Promotion PWA：只管理本專案 tb 版本快取，避免清除同源其他 PWA 的快取。
-const V = 'tb-2026-10-27c';
+const V = 'tb-2026-10-28c';
 const CACHE = 'promotion-' + V;
 const CACHE_PREFIX = 'promotion-tb-';
 const CORE = [
@@ -11,7 +11,15 @@ const CORE = [
   'assets/vn/station.webp', 'assets/vn/park.webp', 'assets/vn/evidence.webp',
   'assets/vn/home.webp', 'assets/vn/office.webp',
   'assets/vn/player.webp', 'assets/vn/senior.webp', 'assets/vn/reporter.webp',
-  'assets/vn/suspect.webp', 'assets/vn/mother.webp'
+  'assets/vn/suspect.webp', 'assets/vn/mother.webp',
+  'assets/vn/detective.webp', 'assets/vn/street.webp', 'assets/vn/checkpoint.webp', 'assets/vn/court.webp',
+  'assets/vn/prosecution.webp', 'assets/vn/bank.webp', 'assets/vn/command.webp',
+  'assets/vn/interrogation.webp', 'assets/vn/accident.webp', 'assets/vn/mountain.webp',
+  'assets/vn/village.webp', 'assets/vn/metro.webp', 'assets/vn/rally.webp', 'assets/vn/training.webp',
+  'assets/vn/briefing.webp',
+  'assets/vn/chief.webp', 'assets/vn/citizen.webp', 'assets/vn/staff.webp', 'assets/vn/lawyer.webp',
+  'assets/vn/prosecutor.webp', 'assets/vn/judge.webp', 'assets/vn/officer_f.webp', 'assets/vn/youth.webp',
+  'assets/vn/indigenous.webp'
 ];
 
 self.addEventListener('install', event => {
@@ -38,6 +46,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   const scope = new URL(self.registration.scope);
   if (url.origin !== scope.origin || !url.pathname.startsWith(scope.pathname)) return;
+  if (url.pathname.endsWith('/sw.js')) return;  // 版本檢查直接讀網路，不經快取
 
   // 首頁上線時優先讀網路新版本；離線則顯示完整快取首頁。
   if (request.mode === 'navigate') {
