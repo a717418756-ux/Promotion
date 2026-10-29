@@ -187,7 +187,7 @@ mark{background:var(--sealbg);color:inherit;border-radius:2px}
 .es-paper{border-radius:6px;overflow:hidden;background:#f7f4ea;border:1px solid #cfc6ad;box-shadow:0 3px 14px rgba(0,0,0,.18)}
 .es-paper-hd{display:flex;justify-content:space-between;padding:8px 14px;background:#3b4a5a;color:#f2efe4;font-size:12px;font-weight:700;letter-spacing:.22em}
 .es-paper-hd small{font-size:11px;letter-spacing:.04em;font-weight:500;opacity:.85}
-.es-paper-body{padding:0 12px 20px 44px;background-image:linear-gradient(90deg,transparent 0 38px,#222 38px 39px,transparent 39px),repeating-linear-gradient(180deg,transparent 0,transparent 33px,#9bb3cc 33px,#9bb3cc 34px);max-height:75vh;overflow:auto}
+.es-paper-body{padding:0 12px 20px 44px;background-image:linear-gradient(90deg,transparent 0 38px,#222 38px 39px,transparent 39px),repeating-linear-gradient(180deg,transparent 0,transparent 33px,#9bb3cc 33px,#9bb3cc 34px)}
 .es-ln{font-family:"Kaiti TC","標楷體","DFKai-SB","BiauKai","Noto Serif TC",serif;font-size:15.5px;line-height:34px;min-height:34px;color:#1f3350;letter-spacing:.03em;word-break:break-all;display:flex}
 .es-mk{flex:none;padding-right:.5em}.es-pad{flex:none;visibility:hidden;white-space:pre;user-select:none;-webkit-user-select:none}.es-tx{flex:1;min-width:0;text-align:justify}
 .es-ln.l1{position:relative}.es-ln.l1>.es-mk{position:absolute;left:-42px;width:36px;padding:0;text-align:center}
@@ -241,7 +241,7 @@ button.mcq-opt:hover,.mcq-opt[aria-pressed="true"]{border-color:var(--ink)}.mcq-
 .gs-grid{flex:1;display:grid;grid-template-columns:repeat(var(--c),1fr);border:1.5px solid #222;min-width:0}
 .gs-note{grid-column:1/-1;font:11px/2 "Kaiti TC","標楷體","DFKai-SB",serif;color:#222;border-bottom:1px solid #222;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gc{aspect-ratio:1/.92;display:grid;place-items:center;border-bottom:1px solid #444;border-right:1px dashed #888;font:clamp(13px,4.2vw,22px)/1 "Kaiti TC","標楷體","DFKai-SB","BiauKai","Noto Serif TC",serif;color:#1f3350;letter-spacing:-.05em;overflow:hidden}
-.gs-grid .gc:nth-child(n){min-width:0}.gc.hi{color:#a5560a}.gc.tts-on{background:rgba(255,213,79,.45)}
+.gc{position:relative;min-width:0}.gc .gp{position:absolute;right:0;bottom:0;font-size:.6em;font-style:normal;line-height:1}.gc.hi{color:#a5560a}.gc.tts-on{background:rgba(255,213,79,.45)}
 :root[data-eink] .gs-page{background:#fff;box-shadow:none;border-color:#000}:root[data-eink] .gc{color:#000;border-bottom-color:#000;border-right-color:#000}:root[data-eink] .gc.hi{text-decoration:underline}
 .comp-doc a{color:var(--jade)}.comp-table td{white-space:normal}
 
@@ -354,7 +354,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-29d 正式版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-29e 正式版</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -1095,7 +1095,7 @@ function compSheet(e){const lines=[],dims=n=>COMP_PAGES[n<22?0:1],w=()=>dims(lin
   while(i<lines.length||!pages.length){const p=pages.length,[cols,rows]=COMP_PAGES[p?1:0],pg=el('div','gs-page'+(p?'':' first'));
     pg.append(el('div','gs-no',`第${p+1}頁`));const wrap=el('div','gs-wrap');if(!p)wrap.append(el('div','gs-score','記<br>分<br>欄'));
     const grid=el('div','gs-grid');grid.style.setProperty('--c',cols);if(!p)grid.append(el('div','gs-note','（答案請從本頁第1行開始書寫，並請標明題號，依序作答）'));
-    for(let r=0;r<rows;r++,i++){const l=lines[i]||[];for(let c=0;c<cols;c++){const x=l[c],d=el('div','gc'+(x?.hi?' hi':''),x?esc(x.c):'');
+    for(let r=0;r<rows;r++,i++){const l=lines[i]||[];for(let c=0;c<cols;c++){const x=l[c],d=el('div','gc'+(x?.hi?' hi':''),x?esc(x.c[0])+(x.c.length>1?`<i class="gp">${esc(x.c.slice(1))}</i>`:''):'');  // 併入的行首標點縮小置於本格右下角
       if(x&&x.pi!==undefined&&!grid.querySelector(`[data-p="${x.pi}"]`))d.dataset.p=x.pi;grid.append(d)}}
     wrap.append(grid);pg.append(wrap);pages.push(pg)}
   root.append(el('p','essay-notice',`考選部國文試卷樣張格式：一字一格、標點佔一格。本篇已揭露 ${used} 字（含標點），寫到第 ${pages.length} 頁${compRev<e.paras.length?'；按「揭露下一段」繼續排入':''}。`),...pages);return root}
@@ -1170,7 +1170,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原（不需要網路，也不連至第三方服務）。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-29d';
+const BACKUP_APP_VERSION='tb-2026-10-29e';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
