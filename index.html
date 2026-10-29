@@ -241,7 +241,7 @@ button.mcq-opt:hover,.mcq-opt[aria-pressed="true"]{border-color:var(--ink)}.mcq-
 .gs-grid{flex:1;display:grid;grid-template-columns:repeat(var(--c),1fr);border:1.5px solid #222;min-width:0}
 .gs-note{grid-column:1/-1;font:11px/2 "Kaiti TC","標楷體","DFKai-SB",serif;color:#222;border-bottom:1px solid #222;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gc{aspect-ratio:1/.92;display:grid;place-items:center;border-bottom:1px solid #444;border-right:1px dashed #888;font:clamp(13px,4.2vw,22px)/1 "Kaiti TC","標楷體","DFKai-SB","BiauKai","Noto Serif TC",serif;color:#1f3350;letter-spacing:-.05em;overflow:hidden}
-.gc{position:relative;min-width:0}.gc .gp{position:absolute;right:0;bottom:0;font-size:.6em;font-style:normal;line-height:1}.gc.hi{color:#a5560a}.gc.tts-on{background:rgba(255,213,79,.45)}
+.gc{min-width:0}.gc.hi{color:#a5560a}.gc.tts-on{background:rgba(255,213,79,.45)}
 :root[data-eink] .gs-page{background:#fff;box-shadow:none;border-color:#000}:root[data-eink] .gc{color:#000;border-bottom-color:#000;border-right-color:#000}:root[data-eink] .gc.hi{text-decoration:underline}
 .comp-doc a{color:var(--jade)}.comp-table td{white-space:normal}
 
@@ -354,7 +354,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-29e 正式版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-29f 正式版</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -1080,22 +1080,24 @@ function viewComp(){const m=$('#main');m.className='comp';
   m.replaceChildren(el('h2','ch','國文作文'),el('p','lead','作文80%＋測驗20%，2小時。範文為提供者逐字校對之原文；勤務經驗是示範，請換成你自己的真實經驗（人名、地點去識別化）。'),tabs);
   ({essay:compEssay,cards:compCards,apply:compApply,doc:m=>m.append(el('div','comp-doc',mdHtml(COMP.md.slice(COMP.md.indexOf('## 一、')))))})[S.compTab||'essay'](m)}  // 講義略去開頭「給接手AI的說明」
 /* 國文試卷（依使用者提供之考選部樣張）：第1頁左側記分欄、首行為作答說明，13格×22行；第2頁起14格×23行。一字一格、標點佔一格、段首空兩格、題目置中；
-   行首遇收尾標點則併入上一行末格。只排已揭露的段落。 */
-const COMP_PAGES=[[13,22],[14,23]],COMP_CLOSE=/[，。、；：！？」』）]/;
+   避頭尾：行首不放收尾標點（把上一行末字連同其後標點移到下一行，上一行末格留空）；行尾不放開引號（移到下一行）。只排已揭露的段落。 */
+const COMP_PAGES=[[13,22],[14,23]],COMP_CLOSE=/[，。、；：！？」』）]/,COMP_OPEN=/[「『（]/;
 function compSheet(e){const lines=[],dims=n=>COMP_PAGES[n<22?0:1],w=()=>dims(lines.length)[0];
   const title=[...e.title];lines.push([...Array(Math.max(0,Math.floor((w()-title.length)/2))).fill(null),...title.map(c=>({c}))]);
   e.paras.slice(0,compRev).forEach(([,t],pi)=>{let line=[null,null],hi=false;
     for(const part of t.split('**')){for(const c of part){
       if(line.length>=w()){lines.push(line);line=[]}
-      if(!line.length&&COMP_CLOSE.test(c)&&lines.length){const prev=lines[lines.length-1],last=prev[prev.length-1];if(last){last.c+=c;continue}}
+      if(!line.length&&COMP_CLOSE.test(c)&&lines.length){const prev=lines[lines.length-1];let k=prev.length;while(k>1&&prev[k-1]&&COMP_CLOSE.test(prev[k-1].c))k--;
+        if(prev[k-1])line=prev.splice(k-1)}
+      else if(COMP_OPEN.test(c)&&line.length===w()-1){lines.push(line);line=[]}
       line.push({c,hi,pi})}hi=!hi}
     lines.push(line)});
-  const used=lines.reduce((n,l)=>n+l.filter(Boolean).reduce((k,x)=>k+x.c.length,0),0)-title.length;
+  const used=lines.reduce((n,l)=>n+l.filter(Boolean).length,0)-title.length;
   const root=el('div','gs'),pages=[];let i=0;
   while(i<lines.length||!pages.length){const p=pages.length,[cols,rows]=COMP_PAGES[p?1:0],pg=el('div','gs-page'+(p?'':' first'));
     pg.append(el('div','gs-no',`第${p+1}頁`));const wrap=el('div','gs-wrap');if(!p)wrap.append(el('div','gs-score','記<br>分<br>欄'));
     const grid=el('div','gs-grid');grid.style.setProperty('--c',cols);if(!p)grid.append(el('div','gs-note','（答案請從本頁第1行開始書寫，並請標明題號，依序作答）'));
-    for(let r=0;r<rows;r++,i++){const l=lines[i]||[];for(let c=0;c<cols;c++){const x=l[c],d=el('div','gc'+(x?.hi?' hi':''),x?esc(x.c[0])+(x.c.length>1?`<i class="gp">${esc(x.c.slice(1))}</i>`:''):'');  // 併入的行首標點縮小置於本格右下角
+    for(let r=0;r<rows;r++,i++){const l=lines[i]||[];for(let c=0;c<cols;c++){const x=l[c],d=el('div','gc'+(x?.hi?' hi':''),x?esc(x.c):'');
       if(x&&x.pi!==undefined&&!grid.querySelector(`[data-p="${x.pi}"]`))d.dataset.p=x.pi;grid.append(d)}}
     wrap.append(grid);pg.append(wrap);pages.push(pg)}
   root.append(el('p','essay-notice',`考選部國文試卷樣張格式：一字一格、標點佔一格。本篇已揭露 ${used} 字（含標點），寫到第 ${pages.length} 頁${compRev<e.paras.length?'；按「揭露下一段」繼續排入':''}。`),...pages);return root}
@@ -1170,7 +1172,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原（不需要網路，也不連至第三方服務）。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-29e';
+const BACKUP_APP_VERSION='tb-2026-10-29f';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
