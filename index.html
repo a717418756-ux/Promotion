@@ -284,6 +284,7 @@ body{margin:0}
 .data-help h2{margin:0 0 8px;font:900 19px var(--f-display)}
 .data-help p,.data-help li{font-size:13px;line-height:1.8}
 .data-help::backdrop{background:#0009}
+.data-help label{display:block;font-size:13px;margin:8px 0}.data-help label input:not([type=checkbox]){display:block;width:100%;box-sizing:border-box;margin-top:4px;padding:6px;font:inherit}
 @media(max-width:670px){.data-tools .chip{font-size:12px;padding:2px 8px}.data-help{max-width:calc(100% - 24px)}}
 
 /* 20a：法條全文、朗讀、挖空回想 */
@@ -354,7 +355,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-30a 正式版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-30b 正式版</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -363,6 +364,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
         <div class="data-tools" role="group" aria-label="資料管理">
           <button class="chip" id="backup" title="備份熟練紀錄、申論草稿及錯漏註記">匯出備份</button>
           <button class="chip" id="restore" title="由已匯出的記憶樹 JSON 備份還原">匯入備份</button>
+          <button class="chip" id="sync" title="經自己的 Google Apps Script 同步進度到 Google 雲端硬碟">雲端同步</button>
           <button class="chip" id="help" title="離線、資料保護與測試說明">使用說明</button>
           <button class="chip" id="ver-btn" title="查看目前版本、強制更新">版本／更新</button>
           <input id="backup-file" type="file" accept=".json,application/json" hidden aria-label="選擇備份 JSON 檔案">
@@ -381,7 +383,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
   <p>作答建議：先默寫→逐段揭露→核對完整答案→記下漏寫之處→評估回想程度。A/B/C 僅為複習優先順序，不是猜題命中機率。</p>
   <p><strong>備份：</strong>按「匯出備份」，會產生本機 JSON 檔，包含本裝置的熟練進度、申論草稿與錯漏註記；請自行保管，不要公開分享。</p>
   <p><strong>還原：</strong>按「匯入備份」選擇前述 JSON 檔；先經確認後合併本裝置的紀錄，<strong>同題衝突時以匯入檔案內容為準</strong>。匯入前請先匯出目前資料以防意外。</p>
-  <p><strong>隱私：</strong>備份與匯入在本機執行，不傳送到伺服器；未按「儲存」的默寫或錯漏，只暫留於目前開啟的頁面記憶體，重整後可能遺失。</p>
+  <p><strong>隱私：</strong>備份與匯入在本機執行，不傳送到伺服器；啟用「雲端同步」時，資料只送到你自己部署的 Apps Script 與你的 Google 雲端硬碟；未按「儲存」的默寫或錯漏，只暫留於目前開啟的頁面記憶體，重整後可能遺失。</p>
   <p><strong>離線：</strong>使用 HTTPS 的正式或測試網站首次開啟並讓資料載入後，才能檢驗離線功能。直接雙擊 HTML 檔不等於已安裝 PWA。</p>
   <p><strong>法條全文：</strong>綠色虛底線的條號可點開全文（只連結寫明法名者，例如「刑法第302條」「刑訴§230」）；「法條」分頁可依條號或關鍵字查詢、背誦模式遮住條文、連續朗讀。</p>
   <p><strong>朗讀：</strong>使用裝置內建語音（需中文語音包；離線可用與否依裝置）。底部控制列可暫停、上下段、調語速與「題答間停頓」，停頓時間就是自我回想時間。</p>
@@ -389,6 +391,15 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
   <p><strong>選擇猜題：</strong>警察法規、行政法、憲法與法學緒論共250題原題＋250題變化題（使用者提供之回測模擬題庫第四版）。原題答錯：看詳解後下一題立即出變化題補強；補強答對標「已補強」，再錯標「弱點」並請你做歷屆真題。原題答對：變化題排在第3天，屆時答錯視同猜對。答對依1、3、7、14天複習；原題與變化題都連對2次為「已掌握」，間隔加倍。「命題分析與弱點」列出弱點考點前20名與各法規答對率。預測僅為統計推估，不代表真實命題。</p>
   <p><strong>國文作文：</strong>3篇範文（科技與人心、帶人之道、萬用格式）可逐段回想、挖空名言成語、朗讀與默寫；名言9句、成語17個做成閃卡；歷屆題套用表可練「根本／精進／結論」；完整講義原文照錄。範文不改寫，經驗段請換成自己的真實經驗。</p>
   <form method="dialog"><button class="btn">關閉</button></form>
+</dialog>
+<dialog class="data-help" id="sync-dialog" aria-labelledby="sync-title">
+  <h2 id="sync-title">Google 雲端同步</h2>
+  <p>進度存到你自己的 Google 雲端硬碟（經你部署的 Apps Script）。各裝置填入同一組網址與密碼即可同步；網址與密碼只存在本裝置，不會放進匯出的備份檔。同一題在兩台裝置都有新紀錄時，以較晚上傳者為準。</p>
+  <label>Apps Script 網址<input id="sync-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></label>
+  <label>同步密碼<input id="sync-key" type="password" autocomplete="off"></label>
+  <label class="sync-auto"><input id="sync-auto" type="checkbox"> 自動同步（開啟 App 時、每分鐘有變更時、切到背景時）</label>
+  <p class="essay-notice" id="sync-status"></p>
+  <div class="row"><button class="btn good" id="sync-now">儲存並立即同步</button><form method="dialog" style="margin-left:auto"><button class="btn">關閉</button></form></div>
 </dialog>
 <dialog class="data-help" id="ver-dialog" aria-labelledby="ver-title">
   <h2 id="ver-title">版本與更新</h2>
@@ -1170,9 +1181,9 @@ $("#recite").onclick=()=>{S.recite=!S.recite;render()};
 $("#eink").onclick=()=>{S.eink=!S.eink;render()};
 let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
-/* 完整的裝置資料備份/還原（不需要網路，也不連至第三方服務）。 */
+/* 完整的裝置資料備份/還原；雲端同步沿用同一份資料與合併規則。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-30a';
+const BACKUP_APP_VERSION='tb-2026-10-30b';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
@@ -1181,9 +1192,10 @@ const backupState=()=>({
   [ERROR_KEY]:JSON.parse(JSON.stringify(essayErrors)),
   [STORY_KEY]:(()=>{try{return JSON.parse(localStorage.getItem(STORY_KEY)||'null')}catch(e){return null}})()
 });
+const backupDoc=()=>({format:BACKUP_FORMAT,schema:1,appVersion:BACKUP_APP_VERSION,exportedAt:new Date().toISOString(),data:backupState()});
 $('#backup').onclick=()=>{
   try{
-    const data={format:BACKUP_FORMAT,schema:1,appVersion:BACKUP_APP_VERSION,exportedAt:new Date().toISOString(),data:backupState()};
+    const data=backupDoc();
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});
     const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
     a.download='升官等記憶樹備份_'+new Date().toISOString().slice(0,10)+'.json';
@@ -1195,7 +1207,12 @@ $('#backup-file').onchange=async e=>{
   const input=e.currentTarget,file=input.files?.[0];input.value='';if(!file)return;
   try{
     if(file.size>2*1024*1024)throw new Error('檔案超過 2 MB，請確認是本工具匯出的備份');
-    const parsed=JSON.parse(await file.text()),data=parsed?.data;
+    if(mergeBackup(JSON.parse(await file.text()),false))alert('匯入完成：已合併熟練、申論草稿及錯漏紀錄；若備份包含劇情進度，會保留其他章節並依題號合併。');
+  }catch(err){alert('匯入失敗，原本資料盡可能保留：'+err.message)}
+};
+// 合併備份：同一題衝突時以備份為準。quiet（雲端同步）：不詢問、不改目前畫面選擇、不清除尚未儲存的草稿。
+function mergeBackup(parsed,quiet){
+    const data=parsed?.data;
     if(parsed?.format!==BACKUP_FORMAT||parsed.schema!==1||!isRecord(data)||!isRecord(data['tb-v1'])||!isRecord(data[DRAFT_KEY])||!isRecord(data[ERROR_KEY]))
       throw new Error('格式或版本不符合記憶樹備份規格');
     const incoming=data['tb-v1'];
@@ -1218,13 +1235,13 @@ $('#backup-file').onchange=async e=>{
           throw new Error('劇情章節內容不符：'+id);
       }
     }
-    if(!confirm('確定匯入備份？將保留本機未衝突的題目紀錄；同一題若有衝突，以備份內容為準。\n建議先匯出本機資料留底。'))return;
+    if(!quiet&&!confirm('確定匯入備份？將保留本機未衝突的題目紀錄；同一題若有衝突，以備份內容為準。\n建議先匯出本機資料留底。'))return false;
     const keys=['tb-v1',DRAFT_KEY,ERROR_KEY,...(storyBackup!=null?[STORY_KEY]:[])],old=Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]));
     const mergeKeys=['known','cards','essayKnown','essayRecall','essaySelf','ch','essayPick','mcq','comp','compDraft'];
     const nextS={...S};
     const scalarKeys=['subject','mode','recite','eink','onlyWeak','essayFilter','mcqSubj','mcqFilter','mcqTab','mcqShuffle','compTab','compPick','compCloze','compPaper'];
-    for(const k of scalarKeys)if(Object.hasOwn(incoming,k))nextS[k]=incoming[k];
-    for(const k of mergeKeys)nextS[k]={...(isRecord(S[k])?S[k]:{}),...(isRecord(incoming[k])?incoming[k]:{})};
+    if(!quiet)for(const k of scalarKeys)if(Object.hasOwn(incoming,k))nextS[k]=incoming[k];
+    for(const k of mergeKeys)if(!quiet||!['ch','essayPick'].includes(k))nextS[k]={...(isRecord(S[k])?S[k]:{}),...(isRecord(incoming[k])?incoming[k]:{})};
     if(!SUBJECTS.some(([id])=>id===nextS.subject))nextS.subject='criminal';
     if(!MODES.some(([id])=>id===nextS.mode))nextS.mode='essay';
     if(!['all','priority','review','errors'].includes(nextS.essayFilter))nextS.essayFilter='all';
@@ -1233,11 +1250,38 @@ $('#backup-file').onchange=async e=>{
     try{localStorage.setItem('tb-v1',JSON.stringify(nextS));localStorage.setItem(DRAFT_KEY,JSON.stringify(mergedDrafts));localStorage.setItem(ERROR_KEY,JSON.stringify(mergedErrors));if(storyBackup!=null){const currentStory=(()=>{try{return JSON.parse(localStorage.getItem(STORY_KEY)||'null')}catch(e){return null}})();const mergedStory={schema:2,chapters:{...(isRecord(currentStory?.chapters)?currentStory.chapters:{}),...storyBackup.chapters},lastChapterId:storyBackup.lastChapterId||currentStory?.lastChapterId||null};localStorage.setItem(STORY_KEY,JSON.stringify(mergedStory))}}
     catch(err){for(const k of keys){try{old[k]===null?localStorage.removeItem(k):localStorage.setItem(k,old[k])}catch(_){}}throw err}
     Object.assign(S,nextS);essayDrafts=mergedDrafts;essayErrors=mergedErrors;
+    if(quiet){if(!document.activeElement?.matches('textarea,input'))render();return true}
     for(const k of Object.keys(essayUnsaved))delete essayUnsaved[k];
     for(const k of Object.keys(essayErrorUnsaved))delete essayErrorUnsaved[k];
-    $('#q').value='';if(storyBackup!=null)window.vnForgetCurrentUI?.();render();alert('匯入完成：已合併熟練、申論草稿及錯漏紀錄；若備份包含劇情進度，會保留其他章節並依題號合併。');
-  }catch(err){alert('匯入失敗，原本資料盡可能保留：'+err.message)}
-};
+    $('#q').value='';if(storyBackup!=null)window.vnForgetCurrentUI?.();render();return true;
+}
+/* 30b Google 雲端同步：經使用者自行部署之 Apps Script，存到自己的雲端硬碟。網址與密碼只存本機，不進備份檔。
+   先下載合併（雲端有他機新進度時，同題以雲端為準）再上傳；上傳帶 base 版本，雲端已被他機更新則重來一次。 */
+const SYNC_KEY='tb-sync-v1';let SY={},syncing=null,lastSent='';
+try{const v=JSON.parse(localStorage.getItem(SYNC_KEY)||'{}');if(isRecord(v))SY=v}catch(e){}
+SY.device||=crypto.randomUUID?.()||String(Math.random()).slice(2);
+const saveSY=()=>{try{localStorage.setItem(SYNC_KEY,JSON.stringify(SY))}catch(e){}};
+const syncMsg=t=>{$('#sync-status').textContent=t};
+const gas=async body=>{const r=await fetch(SY.url,{method:'POST',body:JSON.stringify({...body,key:SY.key})});if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();if(!j.ok&&!j.conflict)throw new Error(j.error||'雲端回應錯誤');return j};
+function cloudSync(){
+  if(!SY.url||!SY.key||!navigator.onLine)return Promise.resolve();
+  return syncing||=(async()=>{
+    for(let i=0;i<2;i++){
+      const p=await gas({action:'pull'});
+      if(p.doc&&p.doc.savedAt!==SY.base)mergeBackup(p.doc.backup,true);
+      const body=backupDoc(),state=JSON.stringify(body.data);
+      const r=await gas({action:'push',base:p.doc?.savedAt||'',device:SY.device,backup:body});
+      if(r.conflict)continue;
+      SY.base=r.savedAt;SY.last=new Date().toLocaleString('zh-TW');saveSY();lastSent=state;syncMsg('上次同步：'+SY.last);return}
+    throw new Error('雲端資料持續被其他裝置更新，請稍後再試');
+  })().catch(e=>{syncMsg('同步失敗：'+e.message)}).finally(()=>{syncing=null})}
+$('#sync').onclick=()=>{$('#sync-url').value=SY.url||'';$('#sync-key').value=SY.key||'';$('#sync-auto').checked=!!SY.auto;syncMsg(SY.last?'上次同步：'+SY.last:'尚未同步');$('#sync-dialog').showModal()};
+$('#sync-now').onclick=()=>{const url=$('#sync-url').value.trim(),key=$('#sync-key').value;
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(url)||!key)return syncMsg('請填入 Apps Script 網址（…/exec）與同步密碼');
+  Object.assign(SY,{url,key,auto:$('#sync-auto').checked});saveSY();syncMsg('同步中…');cloudSync()};
+const autoSync=()=>{if(SY.auto&&!syncing&&JSON.stringify(backupState())!==lastSent)cloudSync()};
+setInterval(autoSync,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')autoSync()});
 $('#help').onclick=()=>$('#help-dialog').showModal();
 // 版本／更新：頁面版本、離線快取版本、線上最新版本；強制更新只清本 App 快取，不動 localStorage。
 const CACHE_PREFIX='promotion-tb-';
@@ -1251,7 +1295,7 @@ $('#ver-force').onclick=async()=>{$('#ver-info').textContent='更新中…';
     if('caches' in window)for(const k of await caches.keys())if(k.startsWith(CACHE_PREFIX))await caches.delete(k)}catch(e){}
   location.reload()};
 
-render();
+render();if(SY.auto)cloudSync();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 
