@@ -355,7 +355,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-30b 正式版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-10-30c 正式版</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -394,12 +394,12 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 </dialog>
 <dialog class="data-help" id="sync-dialog" aria-labelledby="sync-title">
   <h2 id="sync-title">Google 雲端同步</h2>
-  <p>進度存到你自己的 Google 雲端硬碟（經你部署的 Apps Script）。各裝置填入同一組網址與密碼即可同步；網址與密碼只存在本裝置，不會放進匯出的備份檔。同一題在兩台裝置都有新紀錄時，以較晚上傳者為準。</p>
+  <p>進度存到你自己的 Google 雲端硬碟（經你部署的 Apps Script）。各裝置填入同一組網址與密碼即可同步；網址與密碼只存在本裝置，不會放進匯出的備份檔。同一題在兩台裝置都有新紀錄時，以作答時間較新者為準（舊紀錄沒有時間時，選擇題取作答次數多者）。「只從雲端下載」合併雲端進度但不上傳，適合新裝置第一次使用。</p>
   <label>Apps Script 網址<input id="sync-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></label>
   <label>同步密碼<input id="sync-key" type="password" autocomplete="off"></label>
   <label class="sync-auto"><input id="sync-auto" type="checkbox"> 自動同步（開啟 App 時、每分鐘有變更時、切到背景時）</label>
   <p class="essay-notice" id="sync-status"></p>
-  <div class="row"><button class="btn good" id="sync-now">儲存並立即同步</button><form method="dialog" style="margin-left:auto"><button class="btn">關閉</button></form></div>
+  <div class="row"><button class="btn good" id="sync-now">儲存設定並同步</button><button class="btn" id="sync-pull">只從雲端下載</button><form method="dialog" style="margin-left:auto"><button class="btn">關閉</button></form></div>
 </dialog>
 <dialog class="data-help" id="ver-dialog" aria-labelledby="ver-title">
   <h2 id="ver-title">版本與更新</h2>
@@ -431,7 +431,8 @@ const $=s=>document.querySelector(s), el=(t,c,h)=>{const e=document.createElemen
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let S={subject:"criminal",mode:"essay",ch:{},recite:false,eink:false,known:{},cards:{},onlyWeak:false};
 try{Object.assign(S,JSON.parse(localStorage.getItem("tb-v1")||"{}"))}catch(e){}
-const save=()=>{try{localStorage.setItem("tb-v1",JSON.stringify(S))}catch(e){}};
+const SHADOW={};  // 30c：各題內容快照，判斷哪些題目有變動（見 stampMap）
+const save=()=>{stampS();try{localStorage.setItem("tb-v1",JSON.stringify(S))}catch(e){}};
 // 申論題記憶路徑的進度獨立於原本的樹狀節點、閃卡熟練度。
 S.mcq ||= {}; S.comp ||= {}; S.compDraft ||= {}; S.essayPick ||= {}; S.essayKnown ||= {}; S.essayRecall ||= {}; S.essaySelf ||= {}; S.essayFilter ||= "all";
 const DRAFT_KEY='tb-essay-draft-v1';
@@ -439,7 +440,7 @@ const DRAFT_KEY='tb-essay-draft-v1';
 const ERROR_KEY='tb-essay-errors-v1';
 let essayErrors={};
 try{const e=JSON.parse(localStorage.getItem(ERROR_KEY)||'{}');if(e&&typeof e==='object'&&!Array.isArray(e))essayErrors=e}catch(e){}
-const saveErrors=()=>{try{localStorage.setItem(ERROR_KEY,JSON.stringify(essayErrors));return true}catch(e){return false}};
+const saveErrors=()=>{if(SHADOW.ready){stampMap('error',essayErrors,true);save()}try{localStorage.setItem(ERROR_KEY,JSON.stringify(essayErrors));return true}catch(e){return false}};
 let activeTimer=null;
 const stopEssayTimer=()=>{if(activeTimer!==null){clearInterval(activeTimer);activeTimer=null}};
 const clockText=seconds=>`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
@@ -449,7 +450,14 @@ const essayUnsaved={};
 const essayErrorUnsaved={};
 let essayDrafts={};
 try{const v=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');if(v&&typeof v==='object'&&!Array.isArray(v))essayDrafts=v}catch(e){}
-const saveDrafts=()=>{try{localStorage.setItem(DRAFT_KEY,JSON.stringify(essayDrafts));return true}catch(e){return false}};
+const saveDrafts=()=>{if(SHADOW.ready){stampMap('draft',essayDrafts,true);save()}try{localStorage.setItem(DRAFT_KEY,JSON.stringify(essayDrafts));return true}catch(e){return false}};
+// 30c 逐題時間戳 S._t：存檔時比對各題內容，有變動者記下時間；雲端同步合併時同題取較新者。
+const STAMP_MAPS=['known','cards','essayKnown','essayRecall','essaySelf','mcq','comp','compDraft'];
+function stampMap(name,obj,mark){const t=(S._t||={})[name]||={},sh=SHADOW[name]||={};
+  for(const [k,v] of Object.entries(obj||{})){const j=JSON.stringify(v);if(sh[k]!==j){if(mark)t[k]=Date.now();sh[k]=j}}}
+function stampS(){if(SHADOW.ready)STAMP_MAPS.forEach(n=>stampMap(n,S[n],true))}
+function resetShadow(){for(const [n,o] of [...STAMP_MAPS.map(n=>[n,S[n]]),['draft',essayDrafts],['error',essayErrors]]){SHADOW[n]={};stampMap(n,o,false)}SHADOW.ready=true}
+resetShadow();
 const DATA={};
 let ESSAY_DATA;
 async function loadEssays(){
@@ -1183,7 +1191,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原；雲端同步沿用同一份資料與合併規則。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-10-30b';
+const BACKUP_APP_VERSION='tb-2026-10-30c';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
@@ -1241,15 +1249,22 @@ function mergeBackup(parsed,quiet){
     const nextS={...S};
     const scalarKeys=['subject','mode','recite','eink','onlyWeak','essayFilter','mcqSubj','mcqFilter','mcqTab','mcqShuffle','compTab','compPick','compCloze','compPaper'];
     if(!quiet)for(const k of scalarKeys)if(Object.hasOwn(incoming,k))nextS[k]=incoming[k];
-    for(const k of mergeKeys)if(!quiet||!['ch','essayPick'].includes(k))nextS[k]={...(isRecord(S[k])?S[k]:{}),...(isRecord(incoming[k])?incoming[k]:{})};
+    const lt=isRecord(S._t)?S._t:{},it=isRecord(incoming._t)?incoming._t:{},T={...lt};
+    // 同題衝突：檔案匯入以備份為準（記為現在）；雲端同步取時間較新者，選擇題時間相同時取作答次數多者。
+    const pick=(name,loc,inc)=>{const out={...loc},a=isRecord(lt[name])?lt[name]:{},b=isRecord(it[name])?it[name]:{},t={...a};
+      for(const [k,v] of Object.entries(inc)){const ta=a[k]||0,tb=b[k]||0;
+        if(!quiet){out[k]=v;t[k]=Date.now()}
+        else if(!(k in loc)||tb>ta||(tb===ta&&(name!=='mcq'||(v?.n||0)>=(loc[k]?.n||0)))){out[k]=v;if(tb)t[k]=tb}}
+      T[name]=t;return out};
+    for(const k of mergeKeys)if(!quiet||!['ch','essayPick'].includes(k))nextS[k]=STAMP_MAPS.includes(k)?pick(k,isRecord(S[k])?S[k]:{},isRecord(incoming[k])?incoming[k]:{}):{...(isRecord(S[k])?S[k]:{}),...(isRecord(incoming[k])?incoming[k]:{})};
     if(!SUBJECTS.some(([id])=>id===nextS.subject))nextS.subject='criminal';
     if(!MODES.some(([id])=>id===nextS.mode))nextS.mode='essay';
     if(!['all','priority','review','errors'].includes(nextS.essayFilter))nextS.essayFilter='all';
     if(!['due','new','wrong','weak','all','var'].includes(nextS.mcqFilter))delete nextS.mcqFilter;if(!['practice','exam','analysis'].includes(nextS.mcqTab))delete nextS.mcqTab;
-    const mergedDrafts={...essayDrafts,...backupDrafts},mergedErrors={...essayErrors,...backupErrors};
-    try{localStorage.setItem('tb-v1',JSON.stringify(nextS));localStorage.setItem(DRAFT_KEY,JSON.stringify(mergedDrafts));localStorage.setItem(ERROR_KEY,JSON.stringify(mergedErrors));if(storyBackup!=null){const currentStory=(()=>{try{return JSON.parse(localStorage.getItem(STORY_KEY)||'null')}catch(e){return null}})();const mergedStory={schema:2,chapters:{...(isRecord(currentStory?.chapters)?currentStory.chapters:{}),...storyBackup.chapters},lastChapterId:storyBackup.lastChapterId||currentStory?.lastChapterId||null};localStorage.setItem(STORY_KEY,JSON.stringify(mergedStory))}}
+    const mergedDrafts=pick('draft',essayDrafts,backupDrafts),mergedErrors=pick('error',essayErrors,backupErrors);nextS._t=T;
+    try{localStorage.setItem('tb-v1',JSON.stringify(nextS));localStorage.setItem(DRAFT_KEY,JSON.stringify(mergedDrafts));localStorage.setItem(ERROR_KEY,JSON.stringify(mergedErrors));if(storyBackup!=null){const currentStory=(()=>{try{return JSON.parse(localStorage.getItem(STORY_KEY)||'null')}catch(e){return null}})();const cur=isRecord(currentStory?.chapters)?currentStory.chapters:{},mergedStory={schema:2,chapters:{...cur,...Object.fromEntries(Object.entries(storyBackup.chapters).filter(([id,c])=>!quiet||!cur[id]||String(c.updatedAt||'')>=String(cur[id].updatedAt||'')))},lastChapterId:storyBackup.lastChapterId||currentStory?.lastChapterId||null};localStorage.setItem(STORY_KEY,JSON.stringify(mergedStory))}}
     catch(err){for(const k of keys){try{old[k]===null?localStorage.removeItem(k):localStorage.setItem(k,old[k])}catch(_){}}throw err}
-    Object.assign(S,nextS);essayDrafts=mergedDrafts;essayErrors=mergedErrors;
+    Object.assign(S,nextS);essayDrafts=mergedDrafts;essayErrors=mergedErrors;resetShadow();
     if(quiet){if(!document.activeElement?.matches('textarea,input'))render();return true}
     for(const k of Object.keys(essayUnsaved))delete essayUnsaved[k];
     for(const k of Object.keys(essayErrorUnsaved))delete essayErrorUnsaved[k];
@@ -1264,12 +1279,13 @@ const saveSY=()=>{try{localStorage.setItem(SYNC_KEY,JSON.stringify(SY))}catch(e)
 const syncMsg=t=>{$('#sync-status').textContent=t};
 const gas=async body=>{const r=await fetch(SY.url,{method:'POST',body:JSON.stringify({...body,key:SY.key})});if(!r.ok)throw new Error('HTTP '+r.status);
   const j=await r.json();if(!j.ok&&!j.conflict)throw new Error(j.error||'雲端回應錯誤');return j};
-function cloudSync(){
+function cloudSync(pullOnly){
   if(!SY.url||!SY.key||!navigator.onLine)return Promise.resolve();
   return syncing||=(async()=>{
     for(let i=0;i<2;i++){
       const p=await gas({action:'pull'});
       if(p.doc&&p.doc.savedAt!==SY.base)mergeBackup(p.doc.backup,true);
+      if(pullOnly){SY.base=p.doc?.savedAt||SY.base;SY.last=new Date().toLocaleString('zh-TW');saveSY();syncMsg('已從雲端下載合併：'+SY.last);return}
       const body=backupDoc(),state=JSON.stringify(body.data);
       const r=await gas({action:'push',base:p.doc?.savedAt||'',device:SY.device,backup:body});
       if(r.conflict)continue;
@@ -1277,9 +1293,10 @@ function cloudSync(){
     throw new Error('雲端資料持續被其他裝置更新，請稍後再試');
   })().catch(e=>{syncMsg('同步失敗：'+e.message)}).finally(()=>{syncing=null})}
 $('#sync').onclick=()=>{$('#sync-url').value=SY.url||'';$('#sync-key').value=SY.key||'';$('#sync-auto').checked=!!SY.auto;syncMsg(SY.last?'上次同步：'+SY.last:'尚未同步');$('#sync-dialog').showModal()};
-$('#sync-now').onclick=()=>{const url=$('#sync-url').value.trim(),key=$('#sync-key').value;
+const syncBtn=pullOnly=>()=>{const url=$('#sync-url').value.trim(),key=$('#sync-key').value;
   if(!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(url)||!key)return syncMsg('請填入 Apps Script 網址（…/exec）與同步密碼');
-  Object.assign(SY,{url,key,auto:$('#sync-auto').checked});saveSY();syncMsg('同步中…');cloudSync()};
+  Object.assign(SY,{url,key,auto:$('#sync-auto').checked});saveSY();syncMsg('同步中…');cloudSync(pullOnly)};
+$('#sync-now').onclick=syncBtn(false);$('#sync-pull').onclick=syncBtn(true);
 const autoSync=()=>{if(SY.auto&&!syncing&&JSON.stringify(backupState())!==lastSent)cloudSync()};
 setInterval(autoSync,60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')autoSync()});
 $('#help').onclick=()=>$('#help-dialog').showModal();

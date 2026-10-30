@@ -1,7 +1,7 @@
 /* LAW//SHIFT VN educational candidate. Uses only approved essay answers from existing essay-memory.json. */
 (function(){'use strict';
  const VNKEY='tb-vn-v2', LEGACY_KEY='tb-vn-v1'; let episodes=null,chosen=null,game=null,mainRoot=null;const LAWIDX={};let selectedId='';
- const VERSION='tb-2026-10-30b',REV=4;
+ const VERSION='tb-2026-10-30c',REV=4;
  const screenHeight=()=>{let v=window.visualViewport;document.documentElement.style.setProperty('--vn-screen-h',Math.round(v?.height||window.innerHeight)+'px');};
  window.addEventListener('resize',screenHeight,{passive:true});window.visualViewport?.addEventListener('resize',screenHeight,{passive:true});
  const sceneMode=(kind)=>{document.body.classList.toggle('vn-screen',!!kind);document.body.classList.toggle('vn-writing-mode',kind==='writing');if(kind)screenHeight();else document.body.classList.remove('vn-keyboard');};
