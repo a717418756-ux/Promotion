@@ -1,5 +1,5 @@
 // Promotion PWA：只管理本專案 tb 版本快取，避免清除同源其他 PWA 的快取。
-const V = 'tb-2026-11-01b';
+const V = 'tb-2026-11-01c';
 const CACHE = 'promotion-' + V;
 const CACHE_PREFIX = 'promotion-tb-';
 const CORE = [
@@ -19,7 +19,10 @@ const CORE = [
   'assets/vn/briefing.webp',
   'assets/vn/chief.webp', 'assets/vn/citizen.webp', 'assets/vn/staff.webp', 'assets/vn/lawyer.webp',
   'assets/vn/prosecutor.webp', 'assets/vn/judge.webp', 'assets/vn/officer_f.webp', 'assets/vn/youth.webp',
-  'assets/vn/indigenous.webp'
+  'assets/vn/indigenous.webp',
+  'assets/game/dispatch_bg.webp', 'assets/game/dispatch_map.webp', 'assets/game/cards_bg.webp', 'assets/game/card_face.webp',
+  'assets/game/joker.webp', 'assets/game/maze_bg.webp', 'assets/game/door.webp',
+  'assets/game/room_ok.webp', 'assets/game/room_flaw.webp', 'assets/game/room_court.webp'
 ];
 
 self.addEventListener('install', event => {
