@@ -1,7 +1,9 @@
 /* LAW//SHIFT VN educational candidate. Uses only approved essay answers from existing essay-memory.json. */
 (function(){'use strict';
- const VNKEY='tb-vn-v2', LEGACY_KEY='tb-vn-v1'; let episodes=null,chosen=null,game=null,mainRoot=null;const LAWIDX={};let selectedId='';
- const VERSION='tb-2026-10-30c',REV=4;
+ const VNKEY='tb-vn-v2', LEGACY_KEY='tb-vn-v1'; let episodes=null,chosen=null,game=null,mainRoot=null;const LAWIDX={};let selectedId='';let pendingFlush=null;
+ // 11-01a：關閉或切到背景前，把尚未寫入的申論草稿寫入
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')pendingFlush?.()});window.addEventListener('pagehide',()=>pendingFlush?.());
+ const VERSION='tb-2026-11-01b',REV=4;
  const screenHeight=()=>{let v=window.visualViewport;document.documentElement.style.setProperty('--vn-screen-h',Math.round(v?.height||window.innerHeight)+'px');};
  window.addEventListener('resize',screenHeight,{passive:true});window.visualViewport?.addEventListener('resize',screenHeight,{passive:true});
  const sceneMode=(kind)=>{document.body.classList.toggle('vn-screen',!!kind);document.body.classList.toggle('vn-writing-mode',kind==='writing');if(kind)screenHeight();else document.body.classList.remove('vn-keyboard');};
@@ -23,7 +25,7 @@
      answers:game.answers,order:game.order,rev:REV,phase:game.phase,updatedAt:new Date().toISOString()};
    collection.chapters[game.chapterId]=state;collection.lastChapterId=game.chapterId;
    localStorage.setItem(VNKEY,JSON.stringify(collection));
-  }catch(e){console.warn('劇情進度儲存失敗',e)}
+  }catch(e){storeFail()}
  };
  const savedVN=(id)=>{const data=savedAll();return data.chapters[id||data.lastChapterId]||null};
  const q=(obj,selector)=>obj.querySelector(selector);
@@ -33,7 +35,7 @@
  const caseFor=c=>ESSAY_DATA?.items?.find(x=>x.id===c.essayId);
  function reset(){game={chapterId:chosen.id,mode:'easy',slide:0,line:0,phase:'dialogue',score:0,answers:{},order:{}};saveVN()}
  const draftOf=id=>essayDrafts[id]||'';
- const setDraft=(id,v)=>{if(v.trim())essayDrafts[id]=v.slice(0,5000);else delete essayDrafts[id];saveDrafts()};
+ const setDraft=(id,v)=>{if(v.trim())essayDrafts[id]=v.slice(0,5000);else delete essayDrafts[id];return saveDrafts()};
  function goEssayOriginal(){const original=caseFor(chosen);if(!original)return;sceneMode(null);S.subject=original.subject;S.mode='essay';S.essayPick[original.subject]=original.id;document.querySelector('#q').value='';render()}
  function makeTitle(text,extra){const hd=el('div','vn-title');hd.append(el('h2',null,text));if(extra)hd.append(extra);return hd}
  function leaveScene(){saveVN();const last=chosen?.id;chosen=null;game=null;sceneMode(null);selectedId=last||selectedId;startScreen(ESSAY_DATA)}
@@ -58,11 +60,11 @@
   const resume=btn('↩ 繼續此章',()=>beginOrResume(true,selectedId));
   const open=btn('開啟原版申論',()=>{const c=episodes.chapters.find(x=>x.id===selectedId);if(!c)return;const item=caseFor(c);if(!item)return;sceneMode(null);S.subject=item.subject;S.mode='essay';S.essayPick[item.subject]=item.id;document.querySelector('#q').value='';render()});
   const mix=btn('🎲 跨科隨機一章',()=>{const pool=episodes.chapters.filter(c=>c.id!==selectedId);selectedId=pool[Math.floor(Math.random()*pool.length)].id;subject.value='all';renderSelect()});
-  const drills=el('div','vn-controls');drills.append(btn('⚡ 是非快問',()=>truthQuiz(subject.value)),btn('🔢 數字配對',()=>numberQuiz(subject.value)));
+  const drills=el('div','vn-controls');drills.append(...[['dispatch','🚓 勤務派遣台','duty'],['cards','🃏 刑法論證牌組','criminal'],['maze','🚪 刑訴程序迷宮','procedure']].map(([k,label,sub])=>btn(label,()=>playGame(k,episodes.chapters.filter(c=>c.subject===sub)))),btn('🔢 數字配對',()=>numberQuiz(subject.value)));
   action.append(start,resume,open,mix);info.append(action,drills);
   intro.append(info);out.append(intro);
   const foot=el('div','vn-library-shortcut');foot.append(el('h3',null,'劇情玩法與法規資料邊界'),
-   el('p','vn-muted','35章、120道法律解謎＋20組總整理（分類／排序）：每題先回想、再看隨機排序的選項，選錯會說明錯在哪個要件，可點開法條全文，並連到同條文的其他題。另有「是非快問」「數字配對」跨章練習。標 ⚠ 者為校訂答案仍有待確認事項之題目。'),
+   el('p','vn-muted','35章、120道法律解謎＋20組總整理（分類／排序）：每題先回想、再看隨機排序的選項，選錯會說明錯在哪個要件，可點開法條全文，並連到同條文的其他題。另有三科遊戲模式（勤務派遣台、刑法論證牌組、刑訴程序迷宮，題目同樣取自本套校訂內容）與「數字配對」跨章練習。標 ⚠ 者為校訂答案仍有待確認事項之題目。'),
    el('p','vn-muted','所有正式答案只從原 data/essay-memory.json 唯讀載入；背景為本套件共用插畫，並不代表題目事實中一定發生於該場景。'));
   out.append(foot);document.querySelector('#main').replaceChildren(out);mainRoot=out;
   const renderSelect=()=>{
@@ -74,7 +76,7 @@
   const updateCard=()=>{
     const chapter=episodes.chapters.find(c=>c.id===selectedId);if(!chapter)return;
     const item=caseFor(chapter),resumeState=savedVN(chapter.id);
-    const completed=episodes.chapters.filter(c=>savedVN(c.id)?.phase==='end').length;tag.textContent=subjectName(chapter.subject)+' · 第 '+(item?.number||'?')+' 題 · 已完成 '+completed+'/35';title.textContent=chapter.title;
+    const completed=episodes.chapters.filter(c=>savedVN(c.id)?.phase==='end').length;tag.textContent=subjectName(chapter.subject)+' · 第 '+(item?.number||'?')+' 題 · 已完成 '+completed+'/'+episodes.chapters.length;title.textContent=chapter.title;
     cover.src=image(chapter.slides.find(s=>s.bg)?.bg||'office');
     desc.textContent=chapter.summary+(item?.hasCaution?'\n⚠ 待確認：'+chapter.caution:'');
     resume.hidden=!resumeState||resumeState.phase==='end';
@@ -112,8 +114,8 @@
  }
 
  function nextLine(){const slide=chosen.slides[game.slide];if(game.line<slide.lines.length-1){game.line++;saveVN();draw()}else{game.phase=slide.quiz?(game.mode==='easy'?'recall':'quiz'):slide.drill?'quiz':game.slide===chosen.slides.length-1?'final':'dialogue';if(game.phase==='dialogue'){game.slide++;game.line=0;}saveVN();draw()}}
- function nextSlide(){game.slide++;game.line=0;game.phase=game.slide>=chosen.slides.length?'final':'dialogue';saveVN();draw()}
- function optionOrder(test){let o=game.order[test.id];if(!Array.isArray(o)||o.length!==test.options.length){o=test.options.map(x=>x.id);for(let i=o.length-1;i>0;i--){const k=Math.floor(Math.random()*(i+1));[o[i],o[k]]=[o[k],o[i]]}game.order[test.id]=o}return o.map(id=>test.options.find(x=>x.id===id))}
+ function nextSlide(){if(game.slide<chosen.slides.length-1){game.slide++;game.line=0;game.phase='dialogue'}else game.phase='final';saveVN();draw()}
+ function optionOrder(test){let o=game.order[test.id];const ids=test.options.map(x=>x.id);if(!Array.isArray(o)||String([...o].sort())!==String([...ids].sort()))o=game.order[test.id]=shuffle(ids);return o.map(id=>test.options.find(x=>x.id===id))}
  function panelBody(pane){const body=el('div','vn-panel-body');pane.append(body);return body}
  function renderRecall(pane,slide){
   const test=slide.quiz;pane.append(el('span','vn-panel-tag','⚖ 先回想 · 不看選項'),el('h3',null,test.title));
@@ -145,7 +147,7 @@
   }
  }
 
- function orderGame(box,items,msg,done){const pool=items.map((t,i)=>({t,i})).sort(()=>Math.random()-.5),list=el('ol'),grid=el('div','vn-options');let next=0,miss=0;
+ function orderGame(box,items,msg,done){const pool=shuffle(items.map((t,i)=>({t,i}))),list=el('ol'),grid=el('div','vn-options');let next=0,miss=0;
   pool.forEach(x=>{const b=btn(x.t,()=>{if(x.i!==next){miss++;msg.textContent='順序不對，再想想（錯 '+miss+' 次）';return}next++;b.remove();list.append(el('li',null,x.t));
    if(next===items.length){msg.textContent='完成！錯 '+miss+' 次。';done?.(miss)}else msg.textContent='很好，下一個是？'},'vn-answer');grid.append(b)});box.append(list,grid)}
  function renderDrill(pane,slide){
@@ -180,9 +182,12 @@
   const toggle=el('details','vn-prompt');const sum=el('summary',null,'查看完整原始題幹 ▾');toggle.append(sum,el('p',null,e.question));desk.append(toggle);
   const ta=el('textarea','vn-essay-textbox');ta.placeholder='一、破題與法源\n（一）各項搜索合法性\n1、要件與涵攝\n……\n綜上……';ta.value=draftOf(e.id);ta.setAttribute('aria-label','完整申論作答');
   ta.addEventListener('focus',()=>{document.body.classList.add('vn-keyboard');screenHeight()});ta.addEventListener('blur',()=>{document.body.classList.remove('vn-keyboard');screenHeight()});
-  const count=el('span','vn-writer-count','自動儲存 · '+ta.value.length+' 字');ta.addEventListener('input',()=>{setDraft(e.id,ta.value);count.textContent='已儲存 · '+ta.value.length+' 字（與申論訓練共用）'});desk.append(ta);
+  const count=el('span','vn-writer-count','自動儲存 · '+ta.value.length+' 字');let dt=0;
+  // 11-01a：停筆0.8秒或離開輸入框才寫入，依實際寫入結果顯示
+  function flush(){if(!dt)return;clearTimeout(dt);dt=0;count.textContent=(setDraft(e.id,ta.value)?'已儲存 · ':'⚠ 未能儲存，請複製留存 · ')+ta.value.length+' 字（與申論訓練共用）'}
+  ta.addEventListener('input',()=>{count.textContent='編輯中 · '+ta.value.length+' 字';clearTimeout(dt);dt=setTimeout(flush,800)});ta.addEventListener('blur',flush);pendingFlush=flush;desk.append(ta);
   const footer=el('div','vn-writer-footer');footer.append(count,btn('本章筆記',()=>showOverlay('本章筆記｜'+chosen.title,chosen.slides.filter(x=>x.quiz).map(x=>{const r=game.answers[x.quiz.id];return (r?.mode==='easy'?(r.valid?'✓ ':'✗ '):'・')+x.quiz.title+'\n　'+x.quiz.rubric.join(' → ')}).join('\n\n'))),btn('骨架重建',()=>rebuild(e)),btn('答題骨架',()=>showOverlay('原始校訂骨架',e.steps.map((x,i)=>(i+1)+'、'+x).join('\n'))),btn('參考答案',()=>showOverlay('Claude 校訂答案（唯讀）',e.answer)),btn('完成結案',()=>{
-    if(draftOf(e.id).trim().length<15){showOverlay('尚未完成','請先寫下至少一段申論，再結案。結案只代表劇情完成，掌握程度請在下一頁自評。');return}
+    flush();if(draftOf(e.id).trim().length<15){showOverlay('尚未完成','請先寫下至少一段申論，再結案。結案只代表劇情完成，掌握程度請在下一頁自評。');return}
     ta.blur();game.phase='end';saveVN();draw()},'vn-btn primary'));
   desk.append(footer);layout.append(desk);out.append(layout);
  }
@@ -201,16 +206,18 @@
   const check=el('div','vn-selfcheck');e.steps.forEach((x,i)=>{const l=el('label'),c=el('input');c.type='checkbox';const own=()=>S.essaySelf[e.id]||[];c.checked=own().includes(i);c.onchange=()=>{const v=own().filter(x=>x!==i);if(c.checked)v.push(i);S.essaySelf[e.id]=v;save()};l.append(c,document.createTextNode(' '+(i+1)+'、'+x));check.append(l)});
   const grade=el('div','vn-controls');grade.append(el('strong',null,'回想程度：'));
   [[0,'想不起來｜立即重練',0],[1,'有提示才想起｜明天',86400000],[2,'可獨立回想｜3天後',3*86400000]].forEach(([n,label,ms])=>grade.append(btn(label,()=>{
-   S.essayRecall[e.id]={grade:n,at:Date.now(),dueAt:Date.now()+ms};if(n===2)S.essayKnown[e.id]=1;else delete S.essayKnown[e.id];save();showOverlay('已排入複習','已記錄到「申論訓練」的複習排程，可用「到期／未作答」篩選。')})));
+   S.essayRecall[e.id]={grade:n,at:Date.now(),dueAt:Date.now()+ms};if(n===2)S.essayKnown[e.id]=1;else delete S.essayKnown[e.id];save()?showOverlay('已排入複習','已記錄到「申論訓練」的複習排程，可用「到期／未作答」篩選。'):showOverlay('儲存失敗','裝置拒絕儲存，請先匯出備份。')})));
   const errs=el('div','vn-selfcheck'),cats=['法條記錯','要件遺漏','涵攝不足','結論或實務見解錯誤'],boxes=cats.map(c=>{const l=el('label'),x=el('input');x.type='checkbox';l.append(x,document.createTextNode(' '+c));errs.append(l);return x});
   const note=el('textarea','vn-writing');note.rows=2;note.maxLength=1000;note.placeholder='補充錯漏，例如：漏寫 §158-4 權衡因素';
   const saveErr=btn('存入錯漏註記',()=>{const tags=cats.filter((c,i)=>boxes[i].checked).map(c=>'［'+c+'］').join('');const text=(tags+' '+note.value.trim()).trim();if(!text)return;
    essayErrors[e.id]=((essayErrors[e.id]?essayErrors[e.id]+'\n':'')+text).slice(-1200);const ok=saveErrors();showOverlay(ok?'已儲存':'儲存失敗',ok?'已加入「申論訓練」本題的錯漏註記。':'裝置拒絕儲存，請先備份。')});
-  const a=el('div','vn-controls');a.append(btn('查看校訂答案',()=>showOverlay('完整校訂答案',e.answer)),btn('進入原版申論訓練',goEssayOriginal,'vn-btn primary'),btn('重新遊玩',()=>{reset();draw()}));
+  const a=el('div','vn-controls');a.append(btn('查看校訂答案',()=>showOverlay('完整校訂答案',e.answer)),btn('進入原版申論訓練',goEssayOriginal,'vn-btn primary'),btn('重新遊玩',()=>{reset();draw()}),btn('🎮 本章遊戲練習',()=>playGame(LawGames.kindOf(chosen.subject),[chosen])));
   div.append(el('h3',null,'自評：能獨立寫出的段落'),check,grade,el('h3',null,'錯漏分項'),errs,note,saveErr,a);out.append(div);
  }
 
- // 快問：一次10題，題庫由現有資料自動產生（是非＝各題正解與錯誤選項；數字＝三科數字表），不新增法律內容
+ // 遊戲模式見 story/games.js；錯題可直接回到該章劇情
+ const playGame=(kind,chs)=>window.LawGames?.[kind](chs,id=>{chosen=null;beginOrResume(true,id)});
+ // 數字配對：題庫取自三科數字表，不新增法律內容
  function drillDialog(title,qs){
   const dialog=el('dialog','vn-overlay'),inner=el('div','vn-rebuild');let n=0,ok=0;dialog.append(inner);
   const show=()=>{inner.replaceChildren(el('h3',null,title+'｜'+(n+1)+' / '+qs.length));const q=qs[n],box=el('div','vn-options');inner.append(el('p',null,q.text),box);
@@ -220,10 +227,6 @@
   dialog.addEventListener('close',()=>dialog.remove());document.body.append(dialog);dialog.showModal();show();
  }
  const sample=(a,k)=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).slice(0,k).map(x=>x[1]);
- function truthQuiz(sub){
-  const pool=episodes.chapters.filter(c=>sub==='all'||c.subject===sub).flatMap(c=>c.slides.filter(x=>x.quiz).flatMap(x=>x.quiz.options.map(o=>({c,o,q:x.quiz}))));
-  drillDialog('是非快問',sample(pool,10).map(({c,o,q})=>({text:'〈'+c.title+'〉'+o.text,choices:['○ 正確','✗ 錯誤'],answer:o.valid?'○ 正確':'✗ 錯誤',note:(o.valid?'':'錯在：'+o.trap+'\n')+'依據：'+q.law})));
- }
  async function numberQuiz(sub){
   const subs=sub==='all'?['criminal','procedure','duty']:[sub],rows=[];
   for(const id of subs){try{(await load(id)).numbers?.forEach(r=>rows.push(r))}catch(e){}}
@@ -244,7 +247,6 @@
  function showOverlay(title,text){const dialog=el('dialog','vn-overlay');dialog.style.cssText='width:min(700px,calc(100vw - 24px));max-height:min(83dvh,700px);padding:0;border-radius:14px;border:1px solid #7893a8;color:#152438;background:#f9fbff';const inner=el('div');inner.style.cssText='padding:clamp(12px,4vw,22px);';inner.append(el('h3',null,title));const p=el('div');p.style.cssText='white-space:pre-wrap;line-height:1.9;font-size:15px;max-height:60vh;overflow:auto';p.textContent=valSafe(text);inner.append(p);const close=btn('關閉',()=>dialog.close(),'vn-btn primary');close.style.marginTop='14px';inner.append(close);dialog.append(inner);dialog.addEventListener('close',()=>dialog.remove());document.body.append(dialog);dialog.showModal()}
  function draw(){if(!chosen){return}showStage()}
  window.viewVN=async function(_d,all){document.querySelector('.wrap').classList.add('vn-layout');try{if(!episodes){const r=await fetch('story/episodes.json');if(!r.ok)throw new Error('HTTP '+r.status);episodes=await r.json();
-  if(episodes.chapters.length!==35)throw new Error('章節數不完整');
   const available=new Set(all.items.map(x=>x.id));if(episodes.chapters.some(c=>!available.has(c.essayId)))throw new Error('劇情與申論來源題號不相符');
   // 22d 以前劇情內的草稿併入記憶樹同題草稿（記憶樹已有草稿者不覆蓋）
   for(const [id,st] of Object.entries(savedAll().chapters))if(st?.essayDraft){const ep=id.replace(/^vn-/,'');if(!essayDrafts[ep])setDraft(ep,st.essayDraft)}

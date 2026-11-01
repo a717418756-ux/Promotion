@@ -1,5 +1,5 @@
 // Promotion PWA：只管理本專案 tb 版本快取，避免清除同源其他 PWA 的快取。
-const V = 'tb-2026-10-30c';
+const V = 'tb-2026-11-01b';
 const CACHE = 'promotion-' + V;
 const CACHE_PREFIX = 'promotion-tb-';
 const CORE = [
@@ -7,7 +7,7 @@ const CORE = [
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
   'data/criminal.json', 'data/procedure.json', 'data/duty.json',
   'data/essay-memory.json', 'data/laws.json', 'data/mcq.json', 'data/composition.json',
-  'story/vn.css', 'story/vn.js', 'story/episodes.json',
+  'story/vn.css', 'story/vn.js', 'story/episodes.json', 'story/games.css', 'story/games.js',
   'assets/vn/station.webp', 'assets/vn/park.webp', 'assets/vn/evidence.webp',
   'assets/vn/home.webp', 'assets/vn/office.webp',
   'assets/vn/player.webp', 'assets/vn/senior.webp', 'assets/vn/reporter.webp',

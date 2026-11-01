@@ -1,0 +1,107 @@
+/* 三科遊戲模式；圖片缺檔時以漸層顯示，素材規格見 docs「遊戲美術需求」。 */
+.lg{--bg:#0a1220;--panel:#121d30;--line:#2c3e5c;--ink:#eef3fb;--mute:#9fb0c8;--gold:#e9c88a;--ok:#3ecf8e;--bad:#ef6464;--hot:#ffb347;
+ width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;margin:0;padding:0;border:0;color:var(--ink);background:var(--bg);
+ font:15px/1.6 "Noto Sans TC","Microsoft JhengHei",sans-serif;display:flex;flex-direction:column;overflow:hidden}
+.lg::backdrop{background:#000c}
+.lg[open]{display:flex}
+.lg *{box-sizing:border-box}
+.lg button{font:inherit;color:inherit;cursor:pointer}
+.lg button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lg-dispatch{background:url(../assets/game/dispatch_bg.webp) center/cover,radial-gradient(circle at 30% 20%,#17324f,#0a1220 70%)}
+.lg-cards{background:url(../assets/game/cards_bg.webp) center/cover,radial-gradient(circle at 50% 40%,#1d4a3a,#0b1d18 75%)}
+.lg-maze{background:url(../assets/game/maze_bg.webp) center/cover,radial-gradient(circle at 50% 10%,#3a2c4f,#120d1d 75%)}
+.lg-top{display:flex;gap:10px;align-items:center;padding:10px 14px;background:#0008;border-bottom:1px solid var(--line);flex-wrap:wrap;backdrop-filter:blur(6px)}
+.lg-name{display:flex;flex-direction:column;line-height:1.2;margin-right:auto}
+.lg-name b{font-size:18px;letter-spacing:.08em;color:var(--gold)}
+.lg-name small{color:var(--mute);font-size:12px}
+.lg-hud{display:flex;gap:6px;flex-wrap:wrap}
+.lg-stat{display:flex;flex-direction:column;align-items:center;min-width:64px;padding:3px 9px;border:1px solid var(--line);border-radius:8px;background:#0b1626cc}
+.lg-stat i{font-style:normal;font-size:11px;color:var(--mute)}
+.lg-stat b{font-size:15px;color:var(--gold);white-space:nowrap}
+.lg-body{display:block;min-width:0;flex:1;overflow:auto;padding:14px;-webkit-overflow-scrolling:touch}
+.lg-btn{border:1px solid var(--line);background:#1a2840;border-radius:10px;padding:9px 16px;font-weight:700}
+.lg-btn.primary{background:linear-gradient(180deg,#f1d39b,#c99a4f);color:#1a1205;border-color:#f1d39b}
+.lg-btn.ghost{background:transparent}
+.lg-mini{border:1px solid var(--line);background:#16233a;border-radius:7px;padding:3px 9px;font-size:13px;margin:3px 4px 0 0}
+.lg-tag{margin:0 0 4px;color:var(--gold);font-weight:700;font-size:13px;letter-spacing:.04em}
+.lg-q{margin:0 0 12px;font-size:17px;font-weight:700}
+.lg-msg{min-height:1.6em;color:var(--hot);margin:8px 0}
+.lg-note{color:var(--mute);font-size:12px}
+.lg-verdict{border-radius:12px;padding:12px 14px;margin:0 0 12px;background:#0d1828ee;border:1px solid var(--line)}
+.lg-verdict.ok{border-color:var(--ok)}.lg-verdict.bad{border-color:var(--bad)}
+.lg-verdict p{margin:0 0 6px}
+.lg-v-hd{font-size:18px;font-weight:900}
+.lg-verdict.ok .lg-v-hd{color:var(--ok)}.lg-verdict.bad .lg-v-hd{color:var(--bad)}
+.lg-verdict summary{cursor:pointer;color:var(--gold);margin:4px 0}
+.lg-chain{color:var(--gold)}
+.lg-end{text-align:center;padding:10px 0}
+.lg-end h3{font-size:22px;margin:4px 0;color:var(--gold)}
+.lg-debrief{max-width:860px;margin:auto}
+.lg-log{border:1px solid var(--line);border-radius:10px;margin:8px 0;padding:6px 12px;background:#0d1828dd}
+.lg-log summary{cursor:pointer;font-weight:700}
+.lg-log.ok summary{color:var(--ok)}.lg-log.bad summary{color:var(--bad)}
+/* 派遣台 */
+.lg-dispatch .lg-body{background:#0006}
+.lg-dwrap{display:grid;grid-template-columns:minmax(220px,300px) minmax(180px,240px) 1fr;gap:14px;align-items:start}
+.lg-map{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;aspect-ratio:1;padding:8px;border:1px solid var(--line);border-radius:14px;
+ background:url(../assets/game/dispatch_map.webp) center/cover,linear-gradient(135deg,#13253d,#0c1828)}
+.lg-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #ffffff22;border-radius:10px;background:#0b1626aa;padding:4px;min-height:0}
+.lg-zone b{font-size:14px}.lg-zone small{font-size:11px;color:var(--mute)}
+.lg-zone.hq{background:#1c2c48cc;border-color:var(--gold)}
+.lg-zone.alert{background:#5a1d1dcc;border-color:var(--bad);animation:lgPulse 1s infinite alternate}
+.lg-zone.alert small{color:#fff}
+.lg-zone.safe{background:#123c2ccc;border-color:var(--ok)}.lg-zone.fail{background:#3d2a12cc;border-color:var(--hot)}
+@keyframes lgPulse{to{box-shadow:0 0 0 4px #ef646455}}
+.lg-side h4{margin:0 0 6px;color:var(--mute);font-size:13px}
+.lg-call{display:grid;grid-template-columns:1fr auto;gap:2px 8px;width:100%;text-align:left;border:1px solid var(--line);border-radius:10px;background:#101b2ddd;padding:8px 10px;margin-bottom:6px}
+.lg-call b{font-size:13px}.lg-call span{grid-column:1;font-size:12px;color:var(--mute)}
+.lg-call i{grid-row:1/3;grid-column:2;align-self:center;font-style:normal;font-weight:900;color:var(--hot);font-size:18px}
+.lg-call.on{border-color:var(--gold);background:#1e2c46}
+.lg-desk{border:1px solid var(--line);border-radius:14px;padding:14px;background:#0d1828e6;min-height:200px}
+.lg-units{display:grid;gap:8px}
+.lg-unit{text-align:left;border:1px solid #3b5277;border-left:5px solid var(--gold);border-radius:10px;background:#15233b;padding:10px 12px}
+.lg-unit:hover{background:#1d3150}
+/* 論證牌組 */
+.lg-casehd{margin:0;color:var(--gold);text-align:center}
+.lg-case{margin:4px auto 10px;max-width:760px;color:var(--mute);text-align:center;font-size:13px}
+.lg-slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;max-width:1000px;margin:auto}
+.lg-slot{border:2px dashed #ffffff33;border-radius:12px;padding:8px 10px;background:#0006;min-height:96px;font-size:13px}
+.lg-slot b{display:block;color:var(--mute);font-size:12px}.lg-slot p{margin:4px 0 0}
+.lg-slot small{display:block;margin-top:4px;color:var(--gold)}
+.lg-slot.now{border:2px solid var(--gold);background:#2a210f99}
+.lg-slot.done{border:2px solid var(--ok);background:#0f2e2299}
+.lg-cards .lg-msg{text-align:center}
+.lg-acts{display:flex;gap:10px;justify-content:center;margin:6px 0 12px}
+.lg-hand{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:1100px;margin:auto;padding-bottom:20px}
+.lg .lg-card{width:min(200px,44vw);min-height:150px;text-align:left;font-size:13px;line-height:1.5;padding:12px 11px;border-radius:12px;color:#1b1407;
+ border:2px solid #b8924e;background:url(../assets/game/card_face.webp) center/cover,linear-gradient(170deg,#fbf3df,#ecdcb6);box-shadow:0 6px 14px #0007;transition:transform .15s}
+.lg .lg-card.pick{transform:translateY(-12px);border-color:#ff9f1c;box-shadow:0 0 0 3px #ff9f1c88,0 10px 20px #000a}
+.lg-jokers{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.lg-joker{width:180px;min-height:130px;border-radius:12px;border:2px solid #9b7bd6;background:url(../assets/game/joker.webp) center/cover,linear-gradient(160deg,#3b2a63,#1b1233);display:flex;flex-direction:column;gap:6px;padding:12px;text-align:left}
+.lg-joker b{color:var(--gold)}.lg-joker span{font-size:13px}
+/* 程序迷宮 */
+.lg-mazewrap{display:grid;grid-template-columns:minmax(200px,260px) 1fr;gap:16px;align-items:start}
+.lg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:8px;border:1px solid var(--line);border-radius:12px;background:#0008}
+.lg-tile{aspect-ratio:1;border-radius:6px;border:1px solid #ffffff14;background:#ffffff08;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;line-height:1.25;padding:3px;overflow:hidden}
+.lg-tile.ok{background:url(../assets/game/room_ok.webp) center/cover,linear-gradient(160deg,#25466f,#162a45);border-color:#6fa3e0}
+.lg-tile.flaw{background:url(../assets/game/room_flaw.webp) center/cover,linear-gradient(160deg,#6b2020,#3a1010);border-color:var(--bad)}
+.lg-tile.start{background:#1d2b44;border-color:var(--mute)}
+.lg-tile.court{background:url(../assets/game/room_court.webp) center/cover,linear-gradient(160deg,#7a5b22,#3e2d0e);border-color:var(--gold);font-weight:900}
+.lg-tile.here{outline:2px solid var(--gold);animation:lgPulse 1s infinite alternate}
+.lg-room{border:1px solid var(--line);border-radius:14px;padding:14px;background:#120d1dd9}
+.lg-doors{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lg-door{min-height:220px;display:flex;align-items:flex-end;text-align:left;font-size:13px;line-height:1.5;padding:58px 10px 12px;border-radius:70px 70px 10px 10px;
+ border:2px solid #8e6f3c;background:url(../assets/game/door.webp) center/cover,linear-gradient(180deg,#4a3420,#24170c);box-shadow:inset 0 0 0 4px #00000055}
+.lg-door:hover{border-color:var(--gold)}
+@media (max-width:820px){
+ .lg-dwrap,.lg-mazewrap{grid-template-columns:1fr}
+ .lg-desk,.lg-room{order:-1}
+ .lg-map{max-width:250px;margin:auto;width:100%}
+ .lg-grid{max-width:190px;margin:auto;width:100%}
+ .lg-doors{grid-template-columns:1fr}.lg-door{min-height:0;border-radius:40px 40px 10px 10px;padding-top:30px}
+ .lg-stat{min-width:54px;padding:2px 6px}
+}
+:root[data-eink] .lg,:root[data-eink] .lg *{animation:none!important;transition:none!important;box-shadow:none!important;backdrop-filter:none!important}
+:root[data-eink] .lg{--bg:#fff;--panel:#fff;--line:#000;--ink:#000;--mute:#222;--gold:#000;--ok:#000;--bad:#000;--hot:#000;background:#fff!important}
+:root[data-eink] .lg .lg-body,:root[data-eink] .lg [class^="lg-"]:not(.lg-name):not(.lg-hud){background:#fff!important;color:#000!important;border-color:#000!important}
+:root[data-eink] .lg .pick,:root[data-eink] .lg .now,:root[data-eink] .lg .here,:root[data-eink] .lg .alert{border-width:3px!important;outline:2px solid #000}
