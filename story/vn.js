@@ -3,7 +3,7 @@
  const VNKEY='tb-vn-v2', LEGACY_KEY='tb-vn-v1'; let episodes=null,chosen=null,game=null,mainRoot=null;const LAWIDX={};let selectedId='';let pendingFlush=null;
  // 11-01a：關閉或切到背景前，把尚未寫入的申論草稿寫入
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')pendingFlush?.()});window.addEventListener('pagehide',()=>pendingFlush?.());
- const VERSION='tb-2026-11-01c',REV=4;
+ const VERSION='tb-2026-11-02a',REV=4;
  const screenHeight=()=>{let v=window.visualViewport;document.documentElement.style.setProperty('--vn-screen-h',Math.round(v?.height||window.innerHeight)+'px');};
  window.addEventListener('resize',screenHeight,{passive:true});window.visualViewport?.addEventListener('resize',screenHeight,{passive:true});
  const sceneMode=(kind)=>{document.body.classList.toggle('vn-screen',!!kind);document.body.classList.toggle('vn-writing-mode',kind==='writing');if(kind)screenHeight();else document.body.classList.remove('vn-keyboard');};
