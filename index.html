@@ -235,6 +235,9 @@ button.mcq-opt:hover,.mcq-opt[aria-pressed="true"]{border-color:var(--ink)}.mcq-
 .comp-para b{background:var(--amberbg);color:var(--amber);font-weight:600;border-radius:3px;padding:0 2px}
 .comp-prompt blockquote,.comp-doc blockquote{margin:0;border-left:3px solid var(--line);padding:6px 12px;background:var(--panel);color:var(--ink)}
 .comp-card{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:18px;line-height:1.9;font-size:16px;display:grid;gap:8px}.comp-big{font-size:24px;letter-spacing:.1em}
+.comp-rv{min-width:0}.comp-review table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed;min-width:0}.comp-review th,.comp-review td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left;overflow-wrap:anywhere}.comp-review td:first-child{white-space:nowrap}
+@media(max-width:640px){.comp-review table,.comp-review tbody{display:block}.comp-review tr:first-child{display:none}.comp-review tr{display:block;border:1px solid var(--line);border-radius:8px;margin:8px 0;padding:4px 8px}.comp-review td{display:block;border:0;padding:3px 0}.comp-review td:nth-child(1){font-weight:900}.comp-review td:nth-child(2)::before{content:"原句：";color:var(--muted)}.comp-review td:nth-child(3)::before{content:"建議：";color:var(--jade);font-weight:700}.comp-review td:nth-child(4)::before{content:"理由：";color:var(--muted)}}
+.essay-memo p{font-weight:700;margin:8px 0 2px;overflow-wrap:anywhere}
 .comp-apply{font-size:15px;padding:12px 14px}.comp-doc{line-height:1.85;overflow-wrap:anywhere}.comp-doc h2{font:900 20px var(--f-display)}.comp-doc h3{font-size:17px;margin-top:20px}.comp-doc h4{font-size:15px}
 .gs{display:grid;gap:14px}.gs-page{background:#fbfaf5;border:1px solid #cfc6ad;border-radius:4px;padding:8px 10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
 .gs-no{text-align:right;font:12px "Kaiti TC","標楷體","DFKai-SB",serif;color:#333}.gs-wrap{display:flex;gap:6px}
@@ -357,7 +360,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-11-02a 正式版</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-11-06a</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -828,6 +831,7 @@ function viewEssay(d,collection){
     const progress=el('div','essay-progress',`<i style="width:${(revealed/chosen.steps.length*100).toFixed(1)}%"></i>`);
     progress.setAttribute('role','progressbar');progress.setAttribute('aria-valuenow',revealed);progress.setAttribute('aria-valuemax',chosen.steps.length);
     const content=[scene,el('p','lead',`預測 ${chosen.number}｜原稿主觀分類 ${esc(chosen.sourcePriority)}｜學習排序 ${esc(chosen.studyPriority)}｜${chosen.steps.length} 段架構`),question,timerBox,compose,progress,route,actions];
+    if(chosen.memo)content.splice(3,0,el('details','essay-variant essay-memo',`<summary>五點速記（先自己回想，再展開對照）</summary><p>${esc(chosen.memo)}</p>`));
     if(mapVisible&&chosen.visual)content.push(renderVisual(chosen.visual));
     const button=el('button','btn',answerVisible?'收起校訂參考答案':'顯示校訂參考答案');
     button.disabled=revealed<chosen.steps.length;button.setAttribute('aria-expanded',answerVisible);
@@ -864,6 +868,7 @@ function viewEssay(d,collection){
         save();viewEssay(d,collection);
       };gradeBox.append(b);
     });
+    if(chosen.flips?.length)content.push(el('details','essay-variant',`<summary>反向事實｜改一個事實，結論怎麼變（${chosen.flips.length}）</summary><ol>${chosen.flips.map(t=>`<li>${linkLaw(t,SUBJECT_LAW[S.subject])}</li>`).join('')}</ol>`));
     (chosen.variants||[]).forEach(v=>content.push(el('details','essay-variant',`<summary>預測變化題｜${esc(v.title)}</summary><div class="essay-question">${linkLaw(v.question)}</div><ol>${v.points.map(t=>`<li>${linkLaw(t,SUBJECT_LAW[S.subject])}</li>`).join('')}</ol><p class="essay-notice">來源：${esc(v.source)}。要點依本題校訂答案與本App法規整理，不是完整參考答案。</p>`)));
     const mine=refsOf(chosen),df=k=>ESSAY_DATA.items.filter(x=>refsOf(x).has(k)).length;  // 越少題共用的條文，關聯越強
     const cur=(chosen.links||[]).map(l=>({x:ESSAY_DATA.items.find(y=>y.id===l.to),note:l.why})).filter(r=>r.x);
@@ -1144,7 +1149,8 @@ function compEssay(m){
   ta.oninput=()=>{upd();clearTimeout(tt);tt=setTimeout(()=>{S.compDraft[e.id]=ta.value;save()},400)};upd();
   const draft=el('details','essay-variant','<summary>默寫區</summary>');draft.append(ta,cnt);
   m.append(pick,el('h3',null,esc(e.head)),...(e.prompt?[el('div','comp-prompt',mdHtml(e.prompt))]:[]),el('div','essay-review',mdInline((e.prompt?'立意：':'')+e.idea)),act,box,
-    ...(e.recite?[el('p','essay-source-note',mdInline('本篇可背：'+e.recite))]:[]),g,draft)}
+    ...(e.recite?[el('p','essay-source-note',mdInline('本篇可背：'+e.recite))]:[]),
+    ...(e.review?.length?[el('details','essay-variant comp-rv',`<summary>修訂建議與真實性提醒（${e.review.length} 處，原文不變）</summary><div class="comp-review"><table><tr><th>段</th><th>原句</th><th>建議寫法</th><th>理由</th></tr>${e.review.map(r=>`<tr>${r.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</table></div><p class="essay-notice">範文的第一人稱經驗是示範用，請換成你自己真實、去識別化的經驗。</p>`)]:[]),g,draft)}
 // 閃卡：名言（看白話與適用主題→說出名言與出處）、成語（看前半→補完）。到期與未練者優先。
 function compCards(m){
   const used=w=>COMP.essays.filter(e=>e.paras.some(([,p])=>p.includes(w))).map(e=>e.title).join('、')||'範文未用';
@@ -1196,7 +1202,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原；雲端同步沿用同一份資料與合併規則。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-11-02a';
+const BACKUP_APP_VERSION='tb-2026-11-06a';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
