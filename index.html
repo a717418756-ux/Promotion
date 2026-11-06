@@ -238,6 +238,7 @@ button.mcq-opt:hover,.mcq-opt[aria-pressed="true"]{border-color:var(--ink)}.mcq-
 .comp-rv{min-width:0}.comp-review table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed;min-width:0}.comp-review th,.comp-review td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left;overflow-wrap:anywhere}.comp-review td:first-child{white-space:nowrap}
 @media(max-width:640px){.comp-review table,.comp-review tbody{display:block}.comp-review tr:first-child{display:none}.comp-review tr{display:block;border:1px solid var(--line);border-radius:8px;margin:8px 0;padding:4px 8px}.comp-review td{display:block;border:0;padding:3px 0}.comp-review td:nth-child(1){font-weight:900}.comp-review td:nth-child(2)::before{content:"原句：";color:var(--muted)}.comp-review td:nth-child(3)::before{content:"建議：";color:var(--jade);font-weight:700}.comp-review td:nth-child(4)::before{content:"理由：";color:var(--muted)}}
 .essay-memo p{font-weight:700;margin:8px 0 2px;overflow-wrap:anywhere}
+.es-var-ans p{margin:4px 0;overflow-wrap:anywhere}.es-var-ans p.h1{text-indent:0}.es-var-ans p.h2{font-weight:700;margin-top:10px}.es-var-ans p:not(.h1):not(.h2):not(.end){padding-left:1.2em}.es-var-ans p.end{margin-top:10px;font-weight:700}
 .comp-apply{font-size:15px;padding:12px 14px}.comp-doc{line-height:1.85;overflow-wrap:anywhere}.comp-doc h2{font:900 20px var(--f-display)}.comp-doc h3{font-size:17px;margin-top:20px}.comp-doc h4{font-size:15px}
 .gs{display:grid;gap:14px}.gs-page{background:#fbfaf5;border:1px solid #cfc6ad;border-radius:4px;padding:8px 10px 12px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
 .gs-no{text-align:right;font:12px "Kaiti TC","標楷體","DFKai-SB",serif;color:#333}.gs-wrap{display:flex;gap:6px}
@@ -360,7 +361,7 @@ body:has(#tts-bar:not([hidden])) .wrap{padding-bottom:150px}
 <header class="bar">
   <div class="bar-in">
     <div class="top">
-      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-11-06a</small></h1>
+      <h1 class="brand">升官等記憶樹<small>115.11.7 · tb-2026-11-06b</small></h1>
       <div class="seg" id="subj" role="group" aria-label="科目"></div>
       <div class="tools" id="top-tools">
         <button class="chip mobile-tools-toggle" id="mobile-tools" type="button" aria-expanded="false">工具 ▾</button>
@@ -868,8 +869,7 @@ function viewEssay(d,collection){
         save();viewEssay(d,collection);
       };gradeBox.append(b);
     });
-    if(chosen.flips?.length)content.push(el('details','essay-variant',`<summary>反向事實｜改一個事實，結論怎麼變（${chosen.flips.length}）</summary><ol>${chosen.flips.map(t=>`<li>${linkLaw(t,SUBJECT_LAW[S.subject])}</li>`).join('')}</ol>`));
-    (chosen.variants||[]).forEach(v=>content.push(el('details','essay-variant',`<summary>預測變化題｜${esc(v.title)}</summary><div class="essay-question">${linkLaw(v.question)}</div><ol>${v.points.map(t=>`<li>${linkLaw(t,SUBJECT_LAW[S.subject])}</li>`).join('')}</ol><p class="essay-notice">來源：${esc(v.source)}。要點依本題校訂答案與本App法規整理，不是完整參考答案。</p>`)));
+    (chosen.variants||[]).forEach(v=>content.push(el('details','essay-variant',`<summary>延伸題（完整答案）｜${esc(v.title)}</summary><div class="essay-question">${linkLaw(v.question)}</div><div class="es-var-ans">${(v.answer||'').split('\n').map(t=>`<p class="${/^[一二三四五六七八九十]+、/.test(t)?'h1':/^（[一二三四五六七八九十]+）/.test(t)?'h2':/^綜上/.test(t)?'end':''}">${linkLaw(t,SUBJECT_LAW[S.subject])}</p>`).join('')}</div><p class="essay-notice">來源：${esc(v.source)}${v.note?'。'+esc(v.note):''}</p>`)));
     const mine=refsOf(chosen),df=k=>ESSAY_DATA.items.filter(x=>refsOf(x).has(k)).length;  // 越少題共用的條文，關聯越強
     const cur=(chosen.links||[]).map(l=>({x:ESSAY_DATA.items.find(y=>y.id===l.to),note:l.why})).filter(r=>r.x);
     const auto=ESSAY_DATA.items.filter(x=>x!==chosen&&!cur.some(r=>r.x===x)).map(x=>{const s=[...refsOf(x)].filter(k=>mine.has(k)).sort((a,b)=>df(a)-df(b));return{x,note:'共用 '+s.slice(0,3).map(refName).join('、'),w:s.reduce((t,k)=>t+1/df(k),0)}}).filter(r=>r.w).sort((a,b)=>b.w-a.w).slice(0,2);
@@ -1107,7 +1107,7 @@ const compGrade=(k,ok)=>{const b=ok?Math.min((S.comp[k]?.b||0)+1,MCQ_DAYS.length
 let compRev=0;
 function viewComp(){const m=$('#main');m.className='comp';
   const tabs=el('div','essay-toolbar');[['essay','範文背誦'],['cards','名言成語閃卡'],['apply','歷屆題套用'],['doc','完整講義']].forEach(([id,n])=>{const b=el('button','chip',n);b.setAttribute('aria-pressed',(S.compTab||'essay')===id);b.onclick=()=>{S.compTab=id;save();viewComp()};tabs.append(b)});
-  m.replaceChildren(el('h2','ch','國文作文'),el('p','lead','作文80%＋測驗20%，2小時。範文為提供者逐字校對之原文；勤務經驗是示範，請換成你自己的真實經驗（人名、地點去識別化）。'),tabs);
+  m.replaceChildren(el('h2','ch','國文作文'),el('p','lead','作文80%＋測驗20%，2小時。範文已依審稿建議改寫完成，可直接背；經驗段採「背景→困難→行動→結果→反省」五步，有自己的真實經驗時照五步替換（人名、地點去識別化）。'),tabs);
   ({essay:compEssay,cards:compCards,apply:compApply,doc:m=>m.append(el('div','comp-doc',mdHtml(COMP.md.slice(COMP.md.indexOf('## 一、')))))})[S.compTab||'essay'](m)}  // 講義略去開頭「給接手AI的說明」
 /* 國文試卷（依使用者提供之考選部樣張）：第1頁左側記分欄、首行為作答說明，13格×22行；第2頁起14格×23行。一字一格、標點佔一格、段首空兩格、題目置中；
    避頭尾：行首不放收尾標點（把上一行末字連同其後標點移到下一行，上一行末格留空）；行尾不放開引號（移到下一行）。只排已揭露的段落。 */
@@ -1202,7 +1202,7 @@ let qt;$("#q").oninput=()=>{clearTimeout(qt);qt=setTimeout(render,200)};
 
 /* 完整的裝置資料備份/還原；雲端同步沿用同一份資料與合併規則。 */
 const BACKUP_FORMAT='promotion-memory-backup';
-const BACKUP_APP_VERSION='tb-2026-11-06a';
+const BACKUP_APP_VERSION='tb-2026-11-06b';
 const STORY_KEY='tb-vn-v2',OLD_STORY_KEY='tb-vn-v1';
 const isRecord=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const backupState=()=>({
